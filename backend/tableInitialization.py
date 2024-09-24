@@ -1,0 +1,81 @@
+import sqlite3;
+import sqlalchemy;
+
+conn = sqlite3.connect('eduPortalDB.db');
+cursor = conn.cursor();
+
+studentsTableQuery = '''create table if not exists students (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username VARCHAR(255),
+    password VARCHAR(255),
+    major INTEGER,
+    FOREIGN KEY (major) REFERENCES major(id)
+    );'''
+
+advisorsTableQuery = '''create table if not exists advisors (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username VARCHAR(255),
+    password VARCHAR(255),
+    department INTEGER,
+    FOREIGN KEY (department) REFERENCES department(id)
+    );'''
+
+instructorsTableQuery = '''create table if not exists instructors(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username VARCHAR(255),
+    password VARCHAR(255),
+    department INTEGER,
+    FOREIGN KEY (department) REFERENCES department(id)
+    );'''
+
+
+staffTableQuery = '''create table if not exists staff(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username VARCHAR(255),
+    password VARCHAR(255),
+    department INTEGER,
+    FOREIGN KEY (department) REFERENCES department(id)
+    );'''
+
+adminTableQuery = '''create table if not exists admin(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username VARCHAR(255),
+    password VARCHAR(255),
+    );'''
+
+
+courseTableQuery = '''create table if not exists courses(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    prefix CHAR(3),
+    number INTEGER(4),
+    courseName VARCHAR(255),
+    credits INTEGER,
+    semester VARCHAR(2),
+    year INTEGER,
+    classTime VARCHAR(255),
+    instructor INTEGER,
+    FOREIGN KEY (instructor) REFERENCES instructors(id)
+    );'''
+
+takenTableQuery = '''create table if not exists taken(
+    student INTEGER,
+    course INTEGER,
+    grade VARCHAR(5)
+    FOREIGN KEY (student) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (course) REFERENCES courses(id) ON DELETE CASCADE,
+    PRIMARY KEY (student, course)
+    );'''
+
+majorTableQuery = '''create table if not exists major(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    majorName VARCHAR(255),
+    department INTEGER,
+    FOREIGN KEY (department) REFERENCES department(id)
+    );'''
+
+departmentTableQuery = '''create table if not exists department(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    departmentName VARCHAR(255),
+    building VARCHAR(50),
+    office INTEGER
+    );'''
