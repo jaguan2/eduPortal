@@ -60,7 +60,7 @@ courseTableQuery = '''create table if not exists courses(
 takenTableQuery = '''create table if not exists taken(
     student INTEGER,
     course INTEGER,
-    grade VARCHAR(5)
+    grade VARCHAR(5),
     FOREIGN KEY (student) REFERENCES students(id) ON DELETE CASCADE,
     FOREIGN KEY (course) REFERENCES courses(id) ON DELETE CASCADE,
     PRIMARY KEY (student, course)
