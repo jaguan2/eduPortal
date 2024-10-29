@@ -1,7 +1,7 @@
 import sqlite3
 import sqlalchemy
 import pandas as pd
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
@@ -22,3 +22,18 @@ def StudentCourses():
     conn.close()
 
     return student_course_json
+
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    # Simple validation
+    if not username or not password:
+        return jsonify({'error': 'Username and password are required!'}), 400
+
+    # query database to check if user exists
+        return jsonify({'error': 'Invalid username or password!'}), 401
+
+    return jsonify({'message': 'Logged in successfully', 'user_id': username}), 200
