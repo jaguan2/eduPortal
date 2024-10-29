@@ -1,8 +1,8 @@
 import sqlite3;
 import sqlalchemy;
 
-conn = sqlite3.connect('eduPortalDB.db');
-cursor = conn.cursor();
+conn = sqlite3.connect('eduPortalDB.db')
+cursor = conn.cursor()
 
 studentsTableQuery = '''create table if not exists students (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -11,6 +11,7 @@ studentsTableQuery = '''create table if not exists students (
     major INTEGER,
     FOREIGN KEY (major) REFERENCES major(id)
     );'''
+conn.execute(studentsTableQuery)
 
 advisorsTableQuery = '''create table if not exists advisors (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -19,6 +20,7 @@ advisorsTableQuery = '''create table if not exists advisors (
     department INTEGER,
     FOREIGN KEY (department) REFERENCES department(id)
     );'''
+conn.execute(advisorsTableQuery)
 
 instructorsTableQuery = '''create table if not exists instructors(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,7 +29,7 @@ instructorsTableQuery = '''create table if not exists instructors(
     department INTEGER,
     FOREIGN KEY (department) REFERENCES department(id)
     );'''
-
+conn.execute(instructorsTableQuery)
 
 staffTableQuery = '''create table if not exists staff(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,13 +38,14 @@ staffTableQuery = '''create table if not exists staff(
     department INTEGER,
     FOREIGN KEY (department) REFERENCES department(id)
     );'''
+conn.execute(staffTableQuery)
 
 adminTableQuery = '''create table if not exists admin(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username VARCHAR(255),
-    password VARCHAR(255),
+    password VARCHAR(255)
     );'''
-
+conn.execute(adminTableQuery)
 
 courseTableQuery = '''create table if not exists courses(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,15 +59,17 @@ courseTableQuery = '''create table if not exists courses(
     instructor INTEGER,
     FOREIGN KEY (instructor) REFERENCES instructors(id)
     );'''
+conn.execute(courseTableQuery)
 
 takenTableQuery = '''create table if not exists taken(
     student INTEGER,
     course INTEGER,
-    grade VARCHAR(5)
+    grade VARCHAR(5),
     FOREIGN KEY (student) REFERENCES students(id) ON DELETE CASCADE,
     FOREIGN KEY (course) REFERENCES courses(id) ON DELETE CASCADE,
     PRIMARY KEY (student, course)
     );'''
+conn.execute(takenTableQuery)
 
 majorTableQuery = '''create table if not exists major(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,6 +77,7 @@ majorTableQuery = '''create table if not exists major(
     department INTEGER,
     FOREIGN KEY (department) REFERENCES department(id)
     );'''
+conn.execute(majorTableQuery)
 
 departmentTableQuery = '''create table if not exists department(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,3 +85,4 @@ departmentTableQuery = '''create table if not exists department(
     building VARCHAR(50),
     office INTEGER
     );'''
+conn.execute(departmentTableQuery)
