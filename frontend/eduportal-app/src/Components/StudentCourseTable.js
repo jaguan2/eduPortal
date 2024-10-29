@@ -41,3 +41,5 @@ const CourseTable = (data) => {
         </TableContainer>
     )
 }
+
+export default CourseTable;
