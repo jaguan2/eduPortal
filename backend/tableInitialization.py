@@ -56,10 +56,12 @@ courseTableQuery = '''create table if not exists courses(
     semester VARCHAR(2),
     year INTEGER,
     classTime VARCHAR(255),
+    classDay VARCHAR(20),  -- Added classDay column
     instructor INTEGER,
     FOREIGN KEY (instructor) REFERENCES instructors(id)
     );'''
 conn.execute(courseTableQuery)
+
 
 takenTableQuery = '''create table if not exists taken(
     student INTEGER,

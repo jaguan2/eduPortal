@@ -1,18 +1,13 @@
 import React from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper
-} from '@mui/material';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
-const CourseTable = (data) => {
-
-    // api call to get data
-
+const StudentCourseTable = ({ data }) => {
     return (
         <TableContainer component={Paper}>
             <Table>
@@ -25,21 +20,20 @@ const CourseTable = (data) => {
                         <TableCell>Grade</TableCell>
                     </TableRow>
                 </TableHead>
-
                 <TableBody>
-                    {rows.map((data, index) => (
+                    {data.map((course, index) => (
                         <TableRow key={index}>
-                            <TableCell>{data.course}</TableCell>
-                            <TableCell>{data.semester}</TableCell>
-                            <TableCell>{data.year}</TableCell>
-                            <TableCell>{data.credits}</TableCell>
-                            <TableCell>{data.grade}</TableCell>
+                            <TableCell>{course.course}</TableCell>
+                            <TableCell>{course.semester}</TableCell>
+                            <TableCell>{course.year}</TableCell>
+                            <TableCell>{course.credits}</TableCell>
+                            <TableCell>{course.grade}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
             </Table>
         </TableContainer>
-    )
-}
+    );
+};
 
-export default CourseTable;
+export default StudentCourseTable;
