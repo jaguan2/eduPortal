@@ -567,3 +567,71 @@
      1. Admin or staff requests department GPA rankings.
      2. System retrieves GPA data and calculates averages per department.
      3. Ranks are displayed, and the report generation is logged.
+
+## Functions by File
+
+1. **menus.py**
+   - `display_menu(role)`: Display menu options based on user role.
+   - `handle_student_choice(choice, current_user, db_manager)`: Handle menu choices for students.
+   - `handle_instructor_choice(choice, current_user, db_manager)`: Handle menu choices for instructors.
+   - `handle_advisor_choice(choice, current_user, db_manager)`: Handle menu choices for advisors.
+   - `handle_staff_choice(choice, current_user)`: Handle menu choices for staff.
+   - `handle_admin_choice(choice, current_user)`: Handle menu choices for administrators.
+
+2. **Database and Data-Related Files**
+   - `DatabaseManager`: Class for managing database connections and executing queries.
+     - `_connect()`, `_initialize_schema()`, `execute_query()`, `fetch_all()`, `fetch_one()`, `check_uniqueness()`, and other methods for CRUD operations on students, instructors, and courses.
+     - Key methods include `add_student()`, `add_course()`, `enroll_student_in_course()`, `update_course()`, `delete_course()`, etc.
+
+3. **Role-Specific Files (student.py, advisor.py, staff.py, instructor.py, admin.py)**
+   - **Student**: `view_personal_data()`, `what_if_gpa()`, `suggest_courses_for_target_gpa()`, `view_enrolled_courses()`.
+   - **Advisor**: `add_student_to_course()`, `drop_student_from_course()`, `what_if_gpa_for_student()`, `suggest_courses_for_student_gpa_target()`, `view_gpa_summary()`, `view_department_rankings()`.
+   - **Instructor**: `view_courses()`, `view_students_in_course()`.
+   - **Staff**: `assign_course_to_instructor()`, `update_course()`, `delete_course()`, `generate_course_enrollment_report()`.
+   - **Admin**: `view_logs()`, `create_user()`, `update_user()`, `delete_user()`, `view_all_records()`, `generate_report()`.
+
+4. **Analytics and Reporting (analytics/gpa_analysis.py)**
+   - `what_if_gpa()`: Calculate GPA based on hypothetical scenarios.
+   - `calculate_gpa()`, `calculate_total_credits()`: GPA and credits calculation functions.
+   - `generate_gpa_summary()`, `department_gpa_rankings()`, `course_enrollment_report()`: Functions for generating GPA and department reports.
+
+5. **Utilities (utils.py)**
+   - `validate_grade()`, `validate_student_id()`, `validate_course_credits()`, `validate_username_uniqueness()`, etc.: Validation functions for enforcing data integrity and business rules.
+
+6. **Authentication and Authorization (auth.py)**
+   - `authenticate_user()`: Authenticate user based on role, username, and password.
+   - `authorize_access()`: Check permissions based on role.
+
+---
+
+## User Interfaces (UI)
+
+1. **Student UI**: Access to personal data, course enrollment, and GPA analysis tools.
+2. **Advisor UI**: Management of student enrollments and GPA summary views.
+3. **Instructor UI**: Viewing assigned courses and enrolled students.
+4. **Staff UI**: Managing courses, instructors, and generating enrollment reports.
+5. **Admin Console**: Access to system logs, user management, and comprehensive reports.
+
+---
+
+## Actors
+
+1. **Students**: Access personal data, view GPA, and use analysis tools for future courses.
+2. **Advisors**: Manage student enrollments in courses, suggest courses for GPA improvement.
+3. **Instructors**: View and manage information on courses they teach and students enrolled.
+4. **Staff**: Handle department-specific data, course assignments, and report generation.
+5. **Admin**: System-level access for monitoring logs, managing users, and report generation.
+
+---
+
+## Database Tables
+
+1. **students**: Stores student information and credentials.
+2. **advisors**: Advisor data and assigned departments.
+3. **instructors**: Instructor details and department association.
+4. **staff**: Department staff with access to manage course data.
+5. **admin**: Administrator accounts with elevated privileges.
+6. **courses**: Course catalog including course IDs, names, credits, semesters, etc.
+7. **taken**: Records students enrolled in courses and their grades.
+8. **major**: Maps students to their majors.
+9. **department**: Department information, including offices and associated majors.
