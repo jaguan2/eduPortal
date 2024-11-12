@@ -1,0 +1,4 @@
+# Python dependencies
+Flask==3.0.3
+pandas==2.2.3
+SQLAlchemy==2.0.36

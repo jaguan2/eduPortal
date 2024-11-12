@@ -1,0 +1,84 @@
+2024-11-11 16:38:19,126 - USER:  - ROLE:  - ACTION: Database connection established.
+2024-11-11 16:38:19,134 - USER:  - ROLE:  - ACTION: Initialization: Database schema already exists.
+2024-11-11 16:40:50,514 - USER:  - ROLE:  - ACTION: Database connection established.
+2024-11-11 16:40:50,519 - USER:  - ROLE:  - ACTION: Initialization: Database schema already exists.
+2024-11-11 16:45:35,732 - USER:  - ROLE:  - ACTION: Database connection established.
+2024-11-11 16:45:35,739 - USER:  - ROLE:  - ACTION: Initialization: Database schema already exists.
+2024-11-11 17:07:58,410 - USER:  - ROLE:  - ACTION: Database connection established.
+2024-11-11 17:07:58,418 - USER:  - ROLE:  - ACTION: Initialization: Database schema already exists.
+2024-11-11 17:11:59,161 - USER:  - ROLE:  - ACTION: Database connection established.
+2024-11-11 17:11:59,169 - USER:  - ROLE:  - ACTION: Initialization: Database schema already exists.
+2024-11-11 17:13:41,261 - USER:  - ROLE:  - ACTION: Database connection established.
+2024-11-11 17:13:41,268 - USER:  - ROLE:  - ACTION: Initialization: Database schema already exists.
+2024-11-11 17:16:59,284 - USER:  - ROLE:  - ACTION: Database connection established.
+2024-11-11 17:16:59,292 - USER:  - ROLE:  - ACTION: Initialization: Database schema already exists.
+2024-11-11 17:16:59,301 - USER:  - ROLE:  - ACTION: Database connection established.
+2024-11-11 17:16:59,306 - USER:  - ROLE:  - ACTION: Initialization: Database schema already exists.
+2024-11-11 17:27:14,495 - USER:  - ROLE:  - ACTION: Database connection established.
+2024-11-11 17:27:14,503 - USER:  - ROLE:  - ACTION: Initialization: Database schema already exists.
+2024-11-11 17:27:14,512 - USER:  - ROLE:  - ACTION: Database connection established.
+2024-11-11 17:27:14,515 - USER:  - ROLE:  - ACTION: Initialization: Database schema already exists.
+2024-11-11 17:49:18,147 - USER:  - ROLE:  - ACTION: Database connection established.
+2024-11-11 17:49:18,155 - USER:  - ROLE:  - ACTION: Initialization: Database schema already exists.
+2024-11-11 17:49:18,172 - USER:  - ROLE:  - ACTION: Database connection established.
+2024-11-11 17:49:18,176 - USER:  - ROLE:  - ACTION: Initialization: Database schema already exists.
+2024-11-11 17:50:26,397 - USER:  - ROLE:  - ACTION: Database connection established.
+2024-11-11 17:50:26,405 - USER:  - ROLE:  - ACTION: Initialization: Database schema already exists.
+2024-11-11 17:50:26,413 - USER:  - ROLE:  - ACTION: Database connection established.
+2024-11-11 17:50:26,417 - USER:  - ROLE:  - ACTION: Initialization: Database schema already exists.
+2024-11-11 17:56:23,176 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 17:56:23,176 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 17:56:23,180 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 17:56:23,181 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 18:07:20,646 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 18:07:20,647 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 18:07:20,651 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 18:07:20,652 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 18:12:03,489 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 18:12:03,490 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 18:12:03,495 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 18:12:03,496 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 18:55:55,164 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 18:55:55,165 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 18:55:55,168 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 18:55:55,169 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 18:55:59,286 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 18:55:59,287 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 18:55:59,287 - USER: 1 - ROLE: student - ACTION: login - User logged in successfully
+2024-11-11 18:56:10,487 - USER: 1 - ROLE: student - ACTION: error - Error: 'username'
+2024-11-11 18:56:15,307 - USER: 1 - ROLE: student - ACTION: error - Error: 'username'
+2024-11-11 18:56:17,123 - USER: 1 - ROLE: student - ACTION: error - Error: 'username'
+2024-11-11 18:56:17,957 - USER: 1 - ROLE: student - ACTION: error - Error: 'username'
+2024-11-11 18:56:19,250 - USER: 1 - ROLE: student - ACTION: error - Error: 'username'
+2024-11-11 18:56:21,327 - USER: 1 - ROLE: student - ACTION: logout - User logged out
+2024-11-11 18:58:10,186 - USER: N/A - ROLE: N/A - ACTION: Error connecting to database: unable to open database file
+2024-11-11 19:21:08,856 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 19:21:08,857 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 19:21:08,870 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 19:21:08,871 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 19:42:47,426 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 19:42:47,427 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 19:42:47,430 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 19:42:47,431 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 19:43:16,093 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 19:43:16,093 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 19:43:16,097 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 19:43:16,098 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 19:44:59,457 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 19:44:59,458 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 19:52:55,524 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 19:52:55,524 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 19:53:20,997 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 19:53:20,998 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 19:55:35,716 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 19:55:35,717 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 19:55:35,721 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 19:55:35,721 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 19:55:40,562 - USER: N/A - ROLE: N/A - ACTION: error - Unexpected login error: Student.__init__() takes 2 positional arguments but 3 were given
+2024-11-11 19:55:49,938 - USER: N/A - ROLE: N/A - ACTION: error - Unexpected login error: 
+2024-11-11 20:00:43,268 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 20:00:43,268 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 20:00:43,298 - USER: N/A - ROLE: N/A - ACTION: Database connection established.
+2024-11-11 20:00:43,299 - USER: N/A - ROLE: N/A - ACTION: Initialization: Database schema already exists.
+2024-11-11 20:00:48,728 - USER: 1 - ROLE: student - ACTION: login - User logged in successfully
+2024-11-11 20:00:53,027 - USER: 1 - ROLE: student - ACTION: exit - User exited system
