@@ -40,12 +40,32 @@ def login():
         # stored_password = user[1]  # Get the stored password
         if stored_password == password:  # Direct comparison
             # If credentials match, set the session
-            session['user_id'] = user[0]
-            return jsonify({"message": "Login successful", "user_id": user[0]}), 200
+            user_id = user_df.iloc[0]['id'] 
+            session['user_id'] = user_id
+            return jsonify({"message": "Login successful", "user_id": int(user_id)}), 200
         else:
             return jsonify({"error": "Invalid credentials"}), 401
     else:
         return jsonify({"error": "User not found"}), 404
+
+#WORK PLEASE
+@app.route('/profile', methods=['GET'])
+def profile():
+    # Check if the user is logged in by verifying 'user_id' in session
+    if 'user_id' in session:
+        user_id = session['user_id']
+        
+        # Convert user_id to a regular Python int
+        user_id = int(user_id)
+
+        # Print the user_id to the console (for debugging purposes)
+        print(f"User ID from session: {user_id}")
+
+        # Return a JSON response to the client with the user_id
+        return jsonify({"message": "You are logged in", "user_id": user_id}), 200
+    else:
+        return jsonify({"error": "You are not logged in"}), 401
+
 
 @app.route("/StudentCourses", methods=['GET'])
 def StudentCourses():
