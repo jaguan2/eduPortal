@@ -83,6 +83,7 @@ def student_courses():
 
     # Convert the result to JSON
     student_course_json = student_course_df.to_json(orient='records')
+    print(student_course_json)
     return student_course_json
 
 # Logout route

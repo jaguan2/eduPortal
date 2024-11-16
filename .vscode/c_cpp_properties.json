@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "windows-gcc-x86",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:/MinGW/bin/gcc.exe",
+            "cStandard": "${default}",
+            "cppStandard": "${default}",
+            "intelliSenseMode": "windows-gcc-x86",
+            "includePath": [
+                "\"${workspaceFolder}/**\",",
+                "\"C:/MinGW/include\",",
+                "\"C:/MinGW/include/c++/64"
+            ]
+        }
+    ],
+    "version": 4
+}
