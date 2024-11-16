@@ -12,22 +12,61 @@ def StudentCourses():
 
     conn = sqlite3.connect('eduPortalDB.db')
 
-    query ="select course.courseName as course, course.semester as semester, course.year as year, course.credits as credits, taken.grade as grade " + \
-            "from taken inner join course on taken.course = course.id " + \
+    query ="select courses.courseName as course, courses.semester as semester, courses.year as year, courses.credits as credits, taken.grade as grade " + \
+            "from taken inner join courses on taken.course = courses.id " + \
             "where taken.student = '" + current_user + "';"
-    student_course_df = pd.read_sql_query(query)
+    student_course_df = pd.read_sql_query(query, conn)
 
-    student_course_json = student_course_df.to_json(orient='records')
+    student_course_json = student_course_df.to_dict(orient='records')
 
     conn.close()
 
-    return student_course_json
+    return jsonify(student_course_json)
 
 @app.route("/getID", methods=['GET'])
 def getID():
     current_user = "1"
 
     return current_user
+
+@app.route("/whatIfNCourses", methods=['POST'])
+def whatIfNCourses():
+    current_user = "1"
+
+    # new_courses = request.get_json()
+    new_courses = [
+        {
+            "course": "Ethics",
+            "credits": 3,
+            "grade": 4,
+        },
+        {
+            "course": "Algorithms",
+            "credits": 3,
+            "grade": 3.66,
+        }
+    ]
+    new_courses_df = pd.DataFrame(new_courses)
+
+    conn = sqlite3.connect('eduPortalDB.db')
+
+    query = "select courses.courseName as course, courses.credits as credits, taken.grade as grade " + \
+            "from taken inner join courses on taken.course = courses.id " + \
+            "where taken.student = '" + current_user + "';"
+    registered_courses_df = pd.read_sql_query(query, conn)
+
+    all_courses = pd.concat([new_courses_df, registered_courses_df], ignore_index=True)
+
+    attempted_credits = all_courses['credits'].sum()
+    all_courses['earned_credits'] = all_courses['credits'] * all_courses['grade']
+    earned_credits = all_courses['earned_credits'].sum()
+
+    gpa = earned_credits / attempted_credits
+
+    all_courses_dict = all_courses.to_dict(orient="records")
+
+    return jsonify(gpa)
+
 
 @app.route("/login", methods=["POST"])
 def login():
