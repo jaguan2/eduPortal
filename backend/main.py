@@ -27,13 +27,17 @@ def login():
     cursor = conn.cursor()
 
     # Query to get user ID, password, and role
-    query = "SELECT * FROM " + role + " WHERE username = ?;"
-    cursor.execute(query, (username,))
-    user = cursor.fetchone()  # Fetch one record
+    query = "SELECT * FROM " + role + " WHERE username = '" + username + "';"
+    user_df = pd.read_sql(query, conn)
+    user = user_df.iloc[0]['username']
+    stored_password = user_df.iloc[0]['password']
+
+    # cursor.execute(query, (username, password))
+    # user = cursor.fetchone()  # Fetch one record
     conn.close()
 
     if user:
-        stored_password = user[1]  # Get the stored password
+        # stored_password = user[1]  # Get the stored password
         if stored_password == password:  # Direct comparison
             # If credentials match, set the session
             session['user_id'] = user[0]
