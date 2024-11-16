@@ -8,7 +8,7 @@ app = Flask(__name__)
 @app.route("/StudentCourses", methods=['GET'])
 def StudentCourses():
     # get current student info
-    current_student = '123'
+    current_student = '1'
 
     conn = sqlite3.connect('eduPortalDB.db')
 
