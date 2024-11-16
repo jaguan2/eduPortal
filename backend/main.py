@@ -8,6 +8,47 @@ app = Flask(__name__)
 
 CORS(app)
 
+def calculateGPA(current_user):
+    conn = sqlite3.connect('eduPortalDB.db')
+
+    query = "select courses.courseName as course, courses.credits as credits, taken.grade as grade " + \
+            "from taken inner join courses on taken.course = courses.id " + \
+            "where taken.student = '" + current_user + "';"
+    registered_courses_df = pd.read_sql_query(query, conn)
+
+    conn.close()
+
+    attempted_credits = registered_courses_df['credits'].sum()
+    registered_courses_df['earned_credits'] = registered_courses_df['credits'] * registered_courses_df['grade']
+    earned_credits = registered_courses_df['earned_credits'].sum()
+    current_gpa = earned_credits / attempted_credits
+
+    return current_gpa
+
+@app.route("/getGPA", methods=["GET"])
+def currentGPA():
+    current_user = '3'
+    result = calculateGPA(current_user)
+    return jsonify(result)
+
+@app.route("/getID", methods=['GET'])
+def getID():
+    current_user = "1"
+    return current_user
+
+@app.route("/getName", methods=["GET"])
+def getName():
+    current_user = "1"
+    role = "students"
+
+    conn = sqlite3.connect('eduPortalDB.db')
+
+    query = "select username from " + role + " where id = '" + current_user + "';"
+    user_df = pd.read_sql(query, conn)
+    username = user_df.iloc[0]['username']
+
+    return username
+
 @app.route("/StudentCourses", methods=['GET'])
 def StudentCourses():
     # get current student info
@@ -25,12 +66,6 @@ def StudentCourses():
     conn.close()
 
     return jsonify(student_course_json)
-
-@app.route("/getID", methods=['GET'])
-def getID():
-    current_user = "1"
-
-    return current_user
 
 @app.route("/whatIfNCourses", methods=['POST'])
 def whatIfNCourses():
@@ -119,7 +154,6 @@ def whatIfDesiredGPA():
         result = "GPA not possible."
 
     return result
-
 
 @app.route("/login", methods=["POST"])
 def login():
