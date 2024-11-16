@@ -1,62 +1,90 @@
 import sqlite3
+import sqlalchemy
 import pandas as pd
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from auth.auth import auth_bp
 
 app = Flask(__name__)
-CORS(app)
 
-# Register the auth Blueprint with a URL prefix
-app.register_blueprint(auth_bp, url_prefix='/api')
+CORS(app)
 
 @app.route("/StudentCourses", methods=['GET'])
 def StudentCourses():
-    # Get the student ID from the query parameter or return an error if not provided
-    current_student = request.args.get('student_id')
-    if not current_student:
-        return jsonify({"error": "Student ID is required"}), 400
+    # get current student info
+    current_user = '1'
 
     conn = sqlite3.connect('eduPortalDB.db')
 
-    query = """
-    SELECT courses.courseName AS course, courses.semester AS semester, 
-           courses.year AS year, courses.credits AS credits, taken.grade AS grade
-    FROM taken
-    INNER JOIN courses ON taken.course = courses.id
-    WHERE taken.student = ?;
-    """
-    
-    student_course_df = pd.read_sql_query(query, conn, params=(current_student,))
-    student_course_json = student_course_df.to_json(orient='records')
+    query ="select courses.courseName as course, courses.semester as semester, courses.year as year, courses.credits as credits, taken.grade as grade " + \
+            "from taken inner join courses on taken.course = courses.id " + \
+            "where taken.student = '" + current_user + "';"
+    student_course_df = pd.read_sql_query(query, conn)
+
+    student_course_json = student_course_df.to_dict(orient='records')
+
     conn.close()
 
-    return student_course_json
+    return jsonify(student_course_json)
 
-@app.route('/api/student-info', methods=['GET'])
-def get_student_info():
-    try:
-        # Assuming a Student model with name, id, gpa fields
-        student = Student.query.first()  # Replace with actual query for your student
-        student_data = {
-            "name": student.name,
-            "id": student.id,
-            "gpa": student.gpa
+@app.route("/getID", methods=['GET'])
+def getID():
+    current_user = "1"
+
+    return current_user
+
+@app.route("/whatIfNCourses", methods=['POST'])
+def whatIfNCourses():
+    current_user = "1"
+
+    # new_courses = request.get_json()
+    new_courses = [
+        {
+            "course": "Ethics",
+            "credits": 3,
+            "grade": 4,
+        },
+        {
+            "course": "Algorithms",
+            "credits": 3,
+            "grade": 3.66,
         }
-        return jsonify(student_data), 200
-    except Exception as e:
-        print(f"Error fetching student info: {e}")
-        return jsonify({"error": "Failed to fetch student info"}), 500
+    ]
+    new_courses_df = pd.DataFrame(new_courses)
 
-# Map roles to their corresponding tables
-ROLE_TO_TABLE_MAP = {
-    'student': 'students',
-    'advisor': 'advisors',
-    'instructor': 'instructors',
-    'staff': 'staff',
-    'admin': 'admin'
-}
+    conn = sqlite3.connect('eduPortalDB.db')
 
-if __name__ == '__main__':
-    print("Starting Flask server...")
+    query = "select courses.courseName as course, courses.credits as credits, taken.grade as grade " + \
+            "from taken inner join courses on taken.course = courses.id " + \
+            "where taken.student = '" + current_user + "';"
+    registered_courses_df = pd.read_sql_query(query, conn)
+
+    all_courses = pd.concat([new_courses_df, registered_courses_df], ignore_index=True)
+
+    attempted_credits = all_courses['credits'].sum()
+    all_courses['earned_credits'] = all_courses['credits'] * all_courses['grade']
+    earned_credits = all_courses['earned_credits'].sum()
+
+    gpa = earned_credits / attempted_credits
+
+    all_courses_dict = all_courses.to_dict(orient="records")
+
+    return jsonify(gpa)
+
+
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    # Simple validation
+    if not username or not password:
+        return jsonify({'error': 'Username and password are required!'}), 400
+
+    # query database to check if user exists
+        return jsonify({'error': 'Invalid username or password!'}), 401
+
+    return jsonify({'message': 'Logged in successfully', 'user_id': username}), 200
+
+if __name__ == "__main__":
     app.run(debug=True)

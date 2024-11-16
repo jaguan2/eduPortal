@@ -47,3 +47,10 @@ def login():
         return jsonify({'success': True, 'message': 'Logged in successfully', 'user_id': username, 'role': role}), 200
     else:
         return jsonify({'error': 'Invalid username or password!'}), 401
+    
+        # Perform login logic here (e.g., checking credentials)
+    if login_successful:
+        log_action(username, role, f"Logged in successfully")
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False, "error": "Invalid credentials"}), 401
