@@ -2,6 +2,7 @@ import sqlite3
 import pandas as pd
 from flask import Flask, session, request, jsonify
 from flask_session import Session
+import bcrypt
 
 app = Flask(__name__)
 
@@ -10,87 +11,106 @@ app.secret_key = "your_secret_key"  # This key secures your sessions
 app.config["SESSION_TYPE"] = "filesystem"  # Use "redis" for scalability in production
 Session(app)
 
-# Helper function to authenticate user and set session
-def authenticate_and_set_session(username, role):
+# Login
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    role = data.get('role')
+    username = data.get('username')
+    password = data.get('password') 
+
+    if not username or not password:
+        return jsonify({"error": "Missing username or password"}), 400
+
     # Connect to the database
     conn = sqlite3.connect('eduPortalDB.db')
     cursor = conn.cursor()
 
-    # Map roles to their respective tables
-    role_mapping = {
-        'student': 'students',
-        'instructor': 'instructors',
-        'staff': 'staff',
-        'admin': 'admin'
-    }
-
-    table = role_mapping.get(role)
-    if not table:
-        return {"error": "Invalid role"}, 400
-
-    # Use parameterized queries to avoid SQL injection
-    query = f"SELECT id FROM {table} WHERE username = ?;"
+    # Query to get user ID, password, and role
+    query = "SELECT * FROM " + role + " WHERE username = ?;"
     cursor.execute(query, (username,))
     user = cursor.fetchone()  # Fetch one record
     conn.close()
 
     if user:
-        # Store the user ID and role in the session
-        session['user_id'] = user[0]
-        session['role'] = role
-        return {"message": "Login successful", "user_id": user[0]}, 200
+        stored_password = user[1]  # Get the stored password
+        if stored_password == password:  # Direct comparison
+            # If credentials match, set the session
+            session['user_id'] = user[0]
+            return jsonify({"message": "Login successful", "user_id": user[0]}), 200
+        else:
+            return jsonify({"error": "Invalid credentials"}), 401
     else:
-        return {"error": "Invalid credentials"}, 401
+        return jsonify({"error": "User not found"}), 404
 
-# Login route
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    data = request.json
-    username = data.get('username')
-    role = data.get('role')  # Assume role is sent in the request body
-
-    if not username or not role:
-        return jsonify({"error": "Missing username or role"}), 400
-
-    # Authenticate user and set session
-    response, status_code = authenticate_and_set_session(username, role)
-    return jsonify(response), status_code
-
-# Student courses route
 @app.route("/StudentCourses", methods=['GET'])
-def student_courses():
-    # Check if the user is logged in
-    if 'user_id' not in session or session.get('role') != 'student':
-        return jsonify({"error": "Unauthorized"}), 401  # User not logged in or not a student
+def StudentCourses():
+    # get current student info
+    current_user = '1'
 
-    # Get current student info from session
-    current_student = session['user_id']
-
-    # Connect to the database
     conn = sqlite3.connect('eduPortalDB.db')
 
-    query = """
-        SELECT course.courseName AS course, course.semester AS semester, 
-               course.year AS year, course.credits AS credits, 
-               taken.grade AS grade 
-        FROM taken 
-        INNER JOIN course ON taken.course = course.id 
-        WHERE taken.student = ?;
-    """
-    # Use parameterized query to fetch data
-    student_course_df = pd.read_sql_query(query, conn, params=(current_student,))
+    query ="select courses.courseName as course, courses.semester as semester, courses.year as year, courses.credits as credits, taken.grade as grade " + \
+            "from taken inner join courses on taken.course = courses.id " + \
+            "where taken.student = '" + current_user + "';"
+    student_course_df = pd.read_sql_query(query, conn)
+
+    student_course_json = student_course_df.to_dict(orient='records')
+
     conn.close()
 
-    # Convert the result to JSON
-    student_course_json = student_course_df.to_json(orient='records')
-    print(student_course_json)
-    return student_course_json
+    return jsonify(student_course_json)
+
+@app.route("/getID", methods=['GET'])
+def getID():
+    current_user = "1"
+
+    return current_user
+
+@app.route("/whatIfNCourses", methods=['POST'])
+def whatIfNCourses():
+    current_user = "1"
+
+    # new_courses = request.get_json()
+    new_courses = [
+        {
+            "course": "Ethics",
+            "credits": 3,
+            "grade": 4,
+        },
+        {
+            "course": "Algorithms",
+            "credits": 3,
+            "grade": 3.66,
+        }
+    ]
+    new_courses_df = pd.DataFrame(new_courses)
+
+    conn = sqlite3.connect('eduPortalDB.db')
+
+    query = "select courses.courseName as course, courses.credits as credits, taken.grade as grade " + \
+            "from taken inner join courses on taken.course = courses.id " + \
+            "where taken.student = '" + current_user + "';"
+    registered_courses_df = pd.read_sql_query(query, conn)
+
+    all_courses = pd.concat([new_courses_df, registered_courses_df], ignore_index=True)
+
+    attempted_credits = all_courses['credits'].sum()
+    all_courses['earned_credits'] = all_courses['credits'] * all_courses['grade']
+    earned_credits = all_courses['earned_credits'].sum()
+
+    gpa = earned_credits / attempted_credits
+
+    all_courses_dict = all_courses.to_dict(orient="records")
+
+    return jsonify(gpa)
 
 # Logout route
 @app.route('/logout', methods=['POST'])
 def logout():
     session.clear()  # Clear the session data
     return jsonify({"message": "Logged out successfully"}), 200
+
 
 if __name__ == "__main__":
     app.run(debug=True)
