@@ -58,6 +58,8 @@ def whatIfNCourses():
             "where taken.student = '" + current_user + "';"
     registered_courses_df = pd.read_sql_query(query, conn)
 
+    conn.close()
+
     all_courses = pd.concat([new_courses_df, registered_courses_df], ignore_index=True)
 
     attempted_credits = all_courses['credits'].sum()
@@ -69,6 +71,54 @@ def whatIfNCourses():
     all_courses_dict = all_courses.to_dict(orient="records")
 
     return jsonify(gpa)
+
+@app.route("/whatIfDesiredGPA", methods=["POST"])
+def whatIfDesiredGPA():
+    # desired_gpa = request.get_json()
+    current_user = "1"
+    desired_gpa = 3.99
+
+    conn = sqlite3.connect('eduPortalDB.db')
+
+    query = "select courses.courseName as course, courses.credits as credits, taken.grade as grade " + \
+            "from taken inner join courses on taken.course = courses.id " + \
+            "where taken.student = '" + current_user + "';"
+    registered_courses_df = pd.read_sql_query(query, conn)
+
+    conn.close()
+
+    attempted_credits = registered_courses_df['credits'].sum()
+    registered_courses_df['earned_credits'] = registered_courses_df['credits'] * registered_courses_df['grade']
+    earned_credits = registered_courses_df['earned_credits'].sum()
+    current_gpa = earned_credits / attempted_credits
+
+    current_credits = registered_courses_df['credits'].sum()
+    registered_courses_df['earned_points'] = registered_courses_df['credits'] * registered_courses_df['grade']
+    earned_points = registered_courses_df['earned_points'].sum()
+
+    if (desired_gpa <= current_gpa):
+        # ERROR
+        result = "Please enter a GPA higher than your current GPA."
+    elif (desired_gpa == 4.0):
+        # ERROR
+        result = "GPA not possible."
+    else:
+        needed_gpa = 4.0
+        result = []
+        while needed_gpa >= current_gpa:
+            check_divide_by_zero = needed_gpa - desired_gpa
+            if (check_divide_by_zero != 0):
+                required_credits = ((desired_gpa * current_credits) - earned_points) / (needed_gpa - desired_gpa)
+                if ((required_credits > 0) & (required_credits < 120)):
+                    required_credits = round(required_credits)
+                    this_result = str(required_credits) + " credits needed at a " + str(needed_gpa)
+                    result.append(this_result)
+            needed_gpa = needed_gpa - 0.3
+
+    if (result == []):
+        result = "GPA not possible."
+
+    return result
 
 
 @app.route("/login", methods=["POST"])
