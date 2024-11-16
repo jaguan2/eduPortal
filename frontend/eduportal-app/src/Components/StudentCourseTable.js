@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Table,
     TableBody,
@@ -8,10 +8,30 @@ import {
     TableRow,
     Paper
 } from '@mui/material';
+import axios from 'axios'; // Import Axios
 
 const CourseTable = (data) => {
 
     // api call to get data
+    const [rows, setRows] = useState([]);
+    const [error, setError] = useState(''); // State for handling errors
+
+    useEffect(() => {
+        const fetchRows = async () => {
+            try {
+                const response = await axios.get('/StudentCourses');
+                setRows(response.data);
+            } catch (error) {
+                if (error.response) {
+                    setError(error.response.data.error);
+                } else {
+                    setError('An unexpected error occurred!');
+                }
+            }
+        };
+
+        fetchRows();
+    }, []);
 
     return (
         <TableContainer component={Paper}>

@@ -1,5 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
+import CourseTable from './Components/StudentCourseTable';
+import Navigation from './Components/StudentNavigation';
 
 function App() {
   return (
