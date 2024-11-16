@@ -37,3 +37,6 @@ def login():
         return jsonify({'error': 'Invalid username or password!'}), 401
 
     return jsonify({'message': 'Logged in successfully', 'user_id': username}), 200
+
+if __name__ == "__main__":
+    app.run(debug=True)
