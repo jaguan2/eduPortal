@@ -4,11 +4,13 @@ import sqlalchemy;
 conn = sqlite3.connect('eduPortalDB.db')
 cursor = conn.cursor()
 
+# NOTE: Must create check constraint on gpa to make it between 0 and 4
 studentsTableQuery = '''create table if not exists students (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username VARCHAR(255),
     password VARCHAR(255),
     major INTEGER,
+    gpa DOUBLE CHECK (gpa >= 0 AND gpa <= 4),
     FOREIGN KEY (major) REFERENCES major(id)
     );'''
 conn.execute(studentsTableQuery)
@@ -50,12 +52,13 @@ conn.execute(adminTableQuery)
 courseTableQuery = '''create table if not exists courses(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     prefix CHAR(3),
-    number INTEGER(4),
+    number VARCHAR(4),
     courseName VARCHAR(255),
     credits INTEGER,
     semester VARCHAR(2),
     year INTEGER,
     classTime VARCHAR(255),
+    classDay VARCHAR(5),
     instructor INTEGER,
     FOREIGN KEY (instructor) REFERENCES instructors(id)
     );'''
