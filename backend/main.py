@@ -42,8 +42,8 @@ def getID():
 
 @app.route("/getDepartment", methods=['GET'])
 def getDepartment():
-    current_user = 1  # Assuming current_user is numeric
-    role = "instructors"  # You may need to dynamically set the role based on the authenticated user
+    current_user = 1
+    role = "instructors"
     
     conn = sqlite3.connect('eduPortalDB.db')
 
