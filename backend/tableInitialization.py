@@ -89,3 +89,18 @@ departmentTableQuery = '''create table if not exists department(
     office INTEGER
     );'''
 conn.execute(departmentTableQuery)
+
+systemLogsTableQuery = '''
+CREATE TABLE IF NOT EXISTS operation_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    username TEXT,
+    operation_type TEXT CHECK (operation_type IN ('READ', 'WRITE', 'DELETE', 'UPDATE')),
+    table_name TEXT,
+    affected_data TEXT,
+    old_value TEXT,
+    new_value TEXT,
+    operation_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+'''
+conn.execute(systemLogsTableQuery)

@@ -253,5 +253,29 @@ def profile():
     else:
         return jsonify({"error": "You are not logged in"}), 401
 
+@app.route("/viewLogs", methods=["GET"])
+def view_logs():
+    conn = sqlite3.connect('eduPortalDB.db')
+    query = """
+        SELECT 
+            id AS log_id,
+            user_id,
+            username,
+            operation_type,
+            table_name,
+            affected_data,
+            old_value,
+            new_value,
+            operation_timestamp
+        FROM operation_logs
+        ORDER BY operation_timestamp DESC;
+    """
+    logs_df = pd.read_sql_query(query, conn)
+    conn.close()
+
+    logs_json = logs_df.to_dict(orient="records")
+    return jsonify(logs_json), 200
+
+
 if __name__ == "__main__":
     app.run(debug=True)

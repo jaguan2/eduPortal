@@ -44,4 +44,8 @@ department_id = "departmentid"
 department_df = pd.read_excel(excel_file, sheet_name=department_id)
 department_df.to_sql("department", conn, if_exists='replace', index=False)
 
+system_logs = "system_logs"
+system_logs_df = pd.read_excel(excel_file, sheet_name=system_logs)
+system_logs_df.to_sql("system_logs", conn, if_exists='replace', index=False)
+
 conn.close()
