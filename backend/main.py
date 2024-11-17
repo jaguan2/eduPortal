@@ -1,8 +1,8 @@
 import sqlite3
-import sqlalchemy
 import pandas as pd
-from flask import Flask, jsonify, request
+from flask import Flask, session, request, jsonify, request
 from flask_cors import CORS
+from flask_session import Session
 
 app = Flask(__name__)
 
@@ -24,6 +24,10 @@ def calculateGPA(current_user):
     current_gpa = earned_credits / attempted_credits
 
     return current_gpa
+
+@app.route("/")
+def home():
+    return "Hello, World!"
 
 @app.route("/getGPA", methods=["GET"])
 def currentGPA():
@@ -172,16 +176,6 @@ def whatIfDesiredGPA():
 
     return result
 
-import sqlite3
-import pandas as pd
-from flask import Flask, session, request, jsonify, request
-from flask_cors import CORS
-from flask_session import Session
-
-app = Flask(__name__)
-
-CORS(app)
-
 # Configure session management
 app.secret_key = "your_secret_key"  # This key secures your sessions
 app.config["SESSION_TYPE"] = "filesystem"  # Use "redis" for scalability in production
@@ -241,5 +235,6 @@ def profile():
         return jsonify({"message": "You are logged in", "user_id": user_id}), 200
     else:
         return jsonify({"error": "You are not logged in"}), 401
+
 if __name__ == "__main__":
     app.run(debug=True)
