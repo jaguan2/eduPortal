@@ -229,7 +229,8 @@ def login():
             # If credentials match, set the session
             user_id = user_df.iloc[0]['id'] 
             session['user_id'] = user_id
-            return jsonify({"message": "Login successful", "user_id": int(user_id)}), 200
+            session['role'] = role
+            return jsonify({"message": "Login successful", "user_id": user_id, "role": role}), 200
         else:
             return jsonify({"error": "Invalid credentials"}), 401
     else:
@@ -239,11 +240,12 @@ def login():
 @app.route('/profile', methods=['GET'])
 def profile():
     # Check if the user is logged in by verifying 'user_id' in session
-    if 'user_id' in session:
+    if 'user_id' in session and 'role' in session:
         user_id = session['user_id']
         
         # Convert user_id to a regular Python int
         user_id = int(user_id)
+        role = session['role']
 
         # Print the user_id to the console (for debugging purposes)
         print(f"User ID from session: {user_id}")
@@ -276,6 +278,171 @@ def view_logs():
     logs_json = logs_df.to_dict(orient="records")
     return jsonify(logs_json), 200
 
+
+@app.route('/addClass', methods=['GET', 'POST'])
+def addClass():
+    if 'user_id' in session and 'role' in session:
+        user_id = int(session['user_id'])
+        role = session['role']
+
+        # Connect to the database
+        conn = sqlite3.connect('eduPortalDB.db')
+        cursor = conn.cursor()
+
+        if request.method == 'GET':
+            # Query might be wrong, but we'll leave it unchanged as per your request
+            query = "SELECT * FROM courses WHERE id NOT IN (SELECT course FROM taken WHERE student = '" + str(user_id) + "' );"
+
+            cursor.execute(query)
+            courses = cursor.fetchall()
+
+            # Close the connection
+            conn.close()
+
+            # If no courses are found, return an empty list (test statement)
+            if not courses:
+                return jsonify({"message": "No new courses available"}), 200
+
+            # Return the list of courses as JSON
+            courses_list = [
+                {
+                    "id": course[0],
+                    "prefix": course[1],
+                    "number": course[2],
+                    "courseName": course[3],
+                    "credits": course[4],
+                    "semester": course[5],
+                    "year": course[6],
+                    "classTime": course[7],
+                    "instructor": course[8]
+                }
+                for course in courses
+            ]
+
+            return jsonify(courses_list), 200
+
+        if request.method == 'POST':
+            data = request.json
+            course_ids = data.get('course_ids')  # I expect this to be a list of course IDs
+
+            if not course_ids:
+                return jsonify({"error": "No courses selected"}), 400
+
+            # Connect to the database for POST request
+            conn = sqlite3.connect('eduPortalDB.db')
+            cursor = conn.cursor()
+
+            for course_id in course_ids:
+                #checks if student is already in the same course (hopefully)
+                query = (
+                    "SELECT * FROM taken WHERE student = " + user_id + 
+                    " AND course = " + course_id + 
+                    " AND semester = (SELECT semester FROM courses WHERE id = " + course_id + ")"
+                )
+
+                cursor.execute(query, (user_id, course_id, course_id))  # Assuming `course_id` matches the ID in the courses table
+                
+                taken_course = cursor.fetchone()
+
+                # If the student is already enrolled in the course in the same semester, return an error
+                if taken_course:
+                    return jsonify({"error": f"Student has already taken course {course_id} in this semester"}), 400
+
+                # If not enrolled, insert the course into the 'taken' table
+                insert_course = (
+                    query = "INSERT INTO taken(student = " + user_id +", course = "+ course_id +")"
+                )
+                cursor.execute(insert_course, (user_id, course_id))
+            
+            # Commit changes and close the connection
+            conn.commit()
+            conn.close()
+
+            return jsonify({"message": "Courses successfully added"}), 200
+        
+
+@app.route('/dropClass', methods=['GET', 'POST'])
+def dropClass():
+    if 'user_id' in session and 'role' in session:
+        user_id = int(session['user_id'])
+        role = session['role']
+
+        # Connect to the database
+        conn = sqlite3.connect('eduPortalDB.db')
+        cursor = conn.cursor()
+
+        if request.method == 'GET':
+            # Fetch courses that the student is currently enrolled in
+            query = "SELECT * FROM courses c JOIN taken t ON WHERE t.student = " + str(user_id) + " AND t.course = c.id;"
+
+            cursor.execute(query)
+            courses = cursor.fetchall()
+
+            # Close the connection
+            conn.close()
+
+            # If no courses are found, return an empty list (test statement)
+            if not courses:
+                return jsonify({"message": "No courses found"}), 200
+
+            # Return the list of courses as JSON
+            courses_list = [
+                {
+                    "id": course[0],
+                    "prefix": course[1],
+                    "number": course[2],
+                    "courseName": course[3],
+                    "credits": course[4],
+                    "semester": course[5],
+                    "year": course[6],
+                    "classTime": course[7],
+                    "instructor": course[8]
+                }
+                for course in courses
+            ]
+
+            return jsonify(courses_list), 200
+
+        if request.method == 'POST':
+            data = request.json
+            course_ids = data.get('course_ids')  # Expecting a list of course IDs
+
+            if not course_ids:
+                return jsonify({"error": "No courses selected"}), 400
+
+            # Connect to the database for POST request
+            conn = sqlite3.connect('eduPortalDB.db')
+            cursor = conn.cursor()
+
+            for course_id in course_ids:
+                # Check if the student is enrolled in the selected course in the 'taken' table
+                check_query = (
+                    "SELECT * FROM taken WHERE student = " + str(user_id) +
+                    " AND course = " + str(course_id)
+                )
+                cursor.execute(check_query)
+                taken_course = cursor.fetchone()
+
+                # If the student is enrolled in the course, delete it from 'taken'
+                if taken_course:
+                    delete_query = (
+                        "DELETE FROM taken WHERE student = " + str(user_id) +
+                        " AND course = " + str(course_id)
+                    )
+                    cursor.execute(delete_query)
+
+                else:
+                    return jsonify({"error": f"Student is not enrolled in course {course_id}"}), 400
+
+            # Commit the changes and close the connection
+            conn.commit()
+            conn.close()
+
+            return jsonify({"message": "Courses successfully dropped"}), 200
+
+#AdvisorViewStudentSummary 
+# def viewStudentSummary():
+#     query = 
 
 if __name__ == "__main__":
     app.run(debug=True)
