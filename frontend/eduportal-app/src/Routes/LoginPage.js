@@ -8,7 +8,7 @@ import {
     Alert 
 } from 'react-bootstrap';
 
-function LoginPage({ setIsLoggedIn }) {
+function LoginPage({ setIsLoggedIn, setUserRole }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('');
@@ -29,7 +29,9 @@ function LoginPage({ setIsLoggedIn }) {
                 
                 setIsLoggedIn(true);
 
-                navigate("/studentDashboard");
+                setUserRole(role);
+
+                navigate(`/${role}Dashboard`);
             } else {
                 console.error('Login failed:', response.data.error);
                 setError(response.data.error);

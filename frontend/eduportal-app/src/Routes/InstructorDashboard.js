@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './InstructorDashboard.css';
-import InstructorNavigation from './InstructorNavigation';
-import CourseTable from './InstructorCourseTable';
-import Profile from './Profile';
+import InstructorNavigation from '../Components/InstructorNavigation';
+import CourseTable from '../Components/InstructorCourseTable';
+import Profile from '../Components/Profile';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const InstructorDashboard = () => {

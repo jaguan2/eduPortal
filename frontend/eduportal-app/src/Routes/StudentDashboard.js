@@ -1,8 +1,8 @@
 import React from 'react';
 import './StudentDashboard.css';
-import StudentNavigation from './StudentNavigation';
-import CourseTable from './StudentCourseTable';
-import Profile from './Profile';
+import StudentNavigation from '../Components/StudentNavigation';
+import CourseTable from '../Components/StudentCourseTable';
+import Profile from '../Components/Profile';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const StudentDashboard = () => {
