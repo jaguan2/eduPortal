@@ -91,7 +91,7 @@ departmentTableQuery = '''create table if not exists department(
 conn.execute(departmentTableQuery)
 
 systemLogsTableQuery = '''
-CREATE TABLE IF NOT EXISTS operation_logs (
+CREATE TABLE IF NOT EXISTS system_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     username TEXT,
