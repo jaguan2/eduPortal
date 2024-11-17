@@ -1,9 +1,7 @@
 import './App.css';
+import StudentDashboard from './Components/StudentDashboard';
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import CourseTable from './Components/StudentCourseTable';
-import StudentNavigation from './Components/StudentNavigation';
-import Profile from './Components/Profile';
 
 import LoginPage from './Routes/LoginPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -20,7 +18,7 @@ function App() {
         {/* Route for the student dashboard */}
         <Route
           path="/studentDashboard"
-          element={isLoggedIn ? <StudentNavigation /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
+          element={isLoggedIn ? <StudentDashboard /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
         />
       </Routes>
     </Router>

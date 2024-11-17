@@ -1,0 +1,8 @@
+body {
+    display: flex;
+    flex-direction: row;
+}
+
+.StudentDashboard {
+    background-color: blue;
+}
