@@ -1,0 +1,21 @@
+/* StaffNavigation.css */
+.NavigationBox {
+    border: 1px solid #ccc;
+    padding: 15px;
+    background-color: #f9f9f9;
+    max-width: 400px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+}
+.Info {
+    margin-bottom: 10px;
+}
+.InfoLabel {
+    font-weight: bold;
+    display: inline-block;
+    width: 100px;
+}
+.InfoData {
+    display: inline-block;
+    color: #333;
+}

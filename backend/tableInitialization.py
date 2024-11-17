@@ -98,8 +98,6 @@ CREATE TABLE IF NOT EXISTS operation_logs (
     operation_type TEXT CHECK (operation_type IN ('READ', 'WRITE', 'DELETE', 'UPDATE')),
     table_name TEXT,
     affected_data TEXT,
-    old_value TEXT,
-    new_value TEXT,
     operation_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 '''
