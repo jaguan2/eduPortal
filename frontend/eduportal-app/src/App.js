@@ -1,6 +1,6 @@
 import './App.css';
-import StudentDashboard from './Components/StudentDashboard';
-import StaffDashboard from './Components/StaffDashboard'
+import StudentDashboard from './Routes/StudentDashboard';
+import StaffDashboard from './Routes/StaffDashboard'
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 
