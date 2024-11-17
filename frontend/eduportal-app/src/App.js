@@ -6,6 +6,7 @@ import StudentNavigation from './Components/StudentNavigation';
 import Profile from './Components/Profile';
 
 import LoginPage from './Routes/LoginPage';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

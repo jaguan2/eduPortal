@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow
-} from '@mui/material';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios'; // Import Axios
 
 const CourseTable = () => {
@@ -32,31 +25,28 @@ const CourseTable = () => {
     }, []);
 
     return (
-        <TableContainer>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Course</TableCell>
-                        <TableCell>Semester</TableCell>
-                        <TableCell>Year</TableCell>
-                        <TableCell>Credits</TableCell>
-                        <TableCell>Grade</TableCell>
-                    </TableRow>
-                </TableHead>
-
-                <TableBody>
-                    {rows.map((data, index) => (
-                        <TableRow key={index}>
-                            <TableCell>{data.course}</TableCell>
-                            <TableCell>{data.semester}</TableCell>
-                            <TableCell>{data.year}</TableCell>
-                            <TableCell>{data.credits}</TableCell>
-                            <TableCell>{data.grade}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+        <table className="table">
+            <thead>
+                <tr>
+                    <th scope="col">Course</th>
+                    <th scope="col">Semester</th>
+                    <th scope="col">Year</th>
+                    <th scope="col">Credits</th>
+                    <th scope="col">Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                {rows.map((data, index) => (
+                    <tr>
+                        <td scope="row">{data.course}</td>
+                        <td scope="row">{data.semester}</td>
+                        <td scope="row">{data.year}</td>
+                        <td scope="row">{data.credits}</td>
+                        <td scope="row">{data.grade}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
     )
 }
 
