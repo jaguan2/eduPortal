@@ -48,7 +48,7 @@ const StudentNavigation = () => {
     return (
         <div className="NavigationBox container px-4">
             <div className="row">
-                <div className="Info col ">
+                <div className="Info col">
                     <div className="InfoLabel item">UID:</div>
                     <div className="InfoData item">{UID}</div>
                 </div>

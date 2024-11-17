@@ -1,6 +1,6 @@
 import './App.css';
-import StudentDashboard from './Routes/StudentDashboard';
-// import StaffDashboard from './Routes/StaffDashboard'
+import StudentDashboard from './Components/StudentDashboard';
+import InstructorDashboard from './Components/InstructorDashboard';
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 
@@ -26,7 +26,8 @@ function App() {
     //   </Routes>
     // </Router>
     <div className="App">
-      <StudentDashboard/>
+      <InstructorDashboard/>
+      {/* <StudentDashboard/> */}
     </div>
   );
 }
