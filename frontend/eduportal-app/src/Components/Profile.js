@@ -31,7 +31,7 @@ const Profile = () => {
     
     return (
         <div className="ProfileContainer container">
-            <div className="row">
+            <div className="row text-center profile">
                 {/* Profile Image - Takes up 5 columns on large screens, 12 columns on small screens */}
                 <div className="ProfileImage col-12 col-md-5">
                     <img className="img-fluid" src={UserProfilePicture} alt="Profile" />
