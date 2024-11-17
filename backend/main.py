@@ -27,7 +27,7 @@ def calculateGPA(current_user):
 
 @app.route("/getGPA", methods=["GET"])
 def currentGPA():
-    current_user = '3'
+    current_user = '1'
     result = calculateGPA(current_user)
     return jsonify(result)
 

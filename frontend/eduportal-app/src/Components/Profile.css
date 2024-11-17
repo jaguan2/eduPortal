@@ -1,0 +1,14 @@
+body {
+    display: flex;
+    margin: 0;
+}
+
+.ProfileContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.Icon {
+    width: 15vw;  /* Width is 15% of the viewport width */
+    height: auto;  /* Maintain aspect ratio */
+}
