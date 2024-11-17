@@ -36,6 +36,23 @@ def getID():
     current_user = "1"
     return current_user
 
+@app.route("/getDepartment", methods=['GET'])
+def getDepartment():
+    current_user = "1"
+    role = "instructors"
+
+    conn = sqlite3.connect('eduPortalDB.db')
+
+    query = f'''
+        select department.departmentName
+        from {role}
+        join department on {role}.department = department.id
+        where {role}.id = {current_user};
+    '''
+    user_df = pd.read_sql(query, conn)
+    department = user_df.iloc[0]['department']
+    return department
+
 @app.route("/getName", methods=["GET"])
 def getName():
     current_user = "1"
