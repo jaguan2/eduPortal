@@ -42,20 +42,26 @@ def getID():
 
 @app.route("/getDepartment", methods=['GET'])
 def getDepartment():
-    current_user = "1"
-    role = "instructors"
-
+    current_user = 1  # Assuming current_user is numeric
+    role = "instructors"  # You may need to dynamically set the role based on the authenticated user
+    
     conn = sqlite3.connect('eduPortalDB.db')
 
     query = f'''
-        select department.departmentName
-        from {role}
-        join department on {role}.department = department.id
-        where {role}.id = {current_user};
+        SELECT department.departmentName
+        FROM {role}
+        JOIN department ON {role}.department = department.id
+        WHERE {role}.id = ?;
     '''
-    user_df = pd.read_sql(query, conn)
-    department = user_df.iloc[0]['department']
-    return department
+    
+    # Execute the query using a parameterized query
+    user_df = pd.read_sql(query, conn, params=(current_user,))
+    
+    if not user_df.empty:
+        department = user_df.iloc[0]['departmentName']
+        return department
+    else:
+        return "Department not found", 404
 
 @app.route("/getName", methods=["GET"])
 def getName():
