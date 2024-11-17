@@ -1,5 +1,6 @@
 import './App.css';
 import StudentDashboard from './Components/StudentDashboard';
+import StaffDashboard from './Components/StaffDashboard'
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 
@@ -14,11 +15,16 @@ function App() {
       <Routes>
         {/* Route for the login page */}
         <Route path="/" element={<LoginPage setIsLoggedIn={setIsLoggedIn} />} />
-        
+
         {/* Route for the student dashboard */}
         <Route
           path="/studentDashboard"
           element={isLoggedIn ? <StudentDashboard /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
+        />
+        {/*Route for staff dashboard */}
+        <Route
+          path="/staffDashboard"
+          element={isLoggedIn ? <StaffDashboard /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
         />
       </Routes>
     </Router>
