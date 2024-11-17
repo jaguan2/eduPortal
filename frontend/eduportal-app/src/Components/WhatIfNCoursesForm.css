@@ -1,0 +1,33 @@
+.buttons {
+    display: flex;
+    flex-direction: column; 
+    gap: 10px; 
+  }
+
+.row {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.form-input {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.rowHelp {
+    align-items: center;
+}
+
+.results {
+    display: flex;
+    flex-direction: row; 
+    gap: 10px; 
+}
+
+.newGPA {
+    padding-top: 0px;
+}

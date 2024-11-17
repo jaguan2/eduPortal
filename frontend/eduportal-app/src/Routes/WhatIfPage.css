@@ -1,0 +1,42 @@
+.WhatIfNavigation {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 15px;
+
+    background-color: #f0f0f0; 
+    border: 2px solid #333; 
+
+    font-size: 30px;
+}
+
+.WhatIfCalculator {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 15px;
+    
+    background-color: #f0f0f0; 
+    border: 2px solid #333; 
+
+    font-size: 30px;
+}
+
+.toggle-button {
+    background-color: #d3d3d3;
+    color: black;
+    transition: background-color 0.3 ease, color 0.3 ease;
+}
+
+.toggle-button.active {
+    background-color: #6495ed;
+    color: white;
+}
+
+.toggle-button:hover {
+    background-color: #bbb;
+}

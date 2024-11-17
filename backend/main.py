@@ -98,20 +98,10 @@ def StudentCourses():
 def whatIfNCourses():
     current_user = "1"
 
-    # new_courses = request.get_json()
-    new_courses = [
-        {
-            "course": "Ethics",
-            "credits": 3,
-            "grade": 4,
-        },
-        {
-            "course": "Algorithms",
-            "credits": 3,
-            "grade": 3.66,
-        }
-    ]
+    new_courses = request.get_json()
     new_courses_df = pd.DataFrame(new_courses)
+
+    print(new_courses_df)
 
     conn = sqlite3.connect('eduPortalDB.db')
 
@@ -119,8 +109,6 @@ def whatIfNCourses():
             "from taken inner join courses on taken.course = courses.id " + \
             "where taken.student = '" + current_user + "';"
     registered_courses_df = pd.read_sql_query(query, conn)
-
-    conn.close()
 
     all_courses = pd.concat([new_courses_df, registered_courses_df], ignore_index=True)
 
@@ -130,15 +118,17 @@ def whatIfNCourses():
 
     gpa = earned_credits / attempted_credits
 
-    all_courses_dict = all_courses.to_dict(orient="records")
+    gpa = round(gpa, 2)
+
+    # all_courses_dict = all_courses.to_dict(orient="records")
 
     return jsonify(gpa)
 
 @app.route("/whatIfDesiredGPA", methods=["POST"])
 def whatIfDesiredGPA():
-    # desired_gpa = request.get_json()
+    data = request.get_json()
+    desired_gpa = float(data.get('number'))
     current_user = "1"
-    desired_gpa = 3.99
 
     conn = sqlite3.connect('eduPortalDB.db')
 
@@ -154,11 +144,7 @@ def whatIfDesiredGPA():
     earned_credits = registered_courses_df['earned_credits'].sum()
     current_gpa = earned_credits / attempted_credits
 
-    current_credits = registered_courses_df['credits'].sum()
-    registered_courses_df['earned_points'] = registered_courses_df['credits'] * registered_courses_df['grade']
-    earned_points = registered_courses_df['earned_points'].sum()
-
-    if (desired_gpa <= current_gpa):
+    if (desired_gpa <= 0):
         # ERROR
         result = "Please enter a GPA higher than your current GPA."
     elif (desired_gpa == 4.0):
@@ -170,7 +156,7 @@ def whatIfDesiredGPA():
         while needed_gpa >= current_gpa:
             check_divide_by_zero = needed_gpa - desired_gpa
             if (check_divide_by_zero != 0):
-                required_credits = ((desired_gpa * current_credits) - earned_points) / (needed_gpa - desired_gpa)
+                required_credits = ((desired_gpa * attempted_credits) - earned_credits) / (needed_gpa - desired_gpa)
                 if ((required_credits > 0) & (required_credits < 120)):
                     required_credits = round(required_credits)
                     this_result = str(required_credits) + " credits needed at a " + str(needed_gpa)
