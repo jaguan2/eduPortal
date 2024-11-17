@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from "react-router-dom"; 
+import React from 'react';
+import Profile from '../Components/Profile';
+import StaffNavigation from '../Components/StaffNavigation';
 
 const StaffDashboard = () => {
-    const navigate = useNavigate();
-
-    const handleNavigation = () => {
-        navigate("/");
-    }
+    return(
+        <div className="StaffDashboard">
+            <Profile/>
+            <StaffNavigation/>
+        </div>
+    )
 }
+
+export default StaffDashboard

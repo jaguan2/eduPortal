@@ -1,3 +1,4 @@
 node_modules
 .git/index.lock
 flask_session/
+frontend/eduportal-app/src/App.js

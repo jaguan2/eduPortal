@@ -8,55 +8,85 @@ const StaffNavigation = () => {
     const [department, setDepartment] = useState(''); // State for the GPA
     const [error, setError] = useState(''); // State for handling errors
 
-    // Use an API call to fetch the user's uid and gpa
+    // Use an API call to fetch the user's UID and department
     useEffect(() => {
-        // Simulating an API call
+        // const fetchUID = async () => {
+        //     try {
+        //         const response = await axios.get('http://127.0.0.1:5000/getID');
+        //         console.log('UID Response:', response.data);
+        //         setUID(response.data.uid); // Access specific key
+        //     } catch (error) {
+        //         console.error('Error fetching UID:', error);
+        //         setError(error.response?.data?.error || 'Failed to fetch UID');
+        //     }
+        // };
+
         const fetchUID = async () => {
             try {
                 const response = await axios.get('http://127.0.0.1:5000/getID');
-                console.log(response.data)
-                setUID(response.data);
-            } catch (error) {
-                if (error.response) {
-                    setError(error.response.data.error);
+                if (response.data.uid) {
+                    setUID(response.data.uid);
                 } else {
-                    setError('An unexpected error occurred!');
+                    setError(response.data.error || "Unknown error");
                 }
+            } catch (error) {
+                setError(error.response?.data?.error || "Failed to fetch UID");
             }
         };
-
-        fetchUID();
 
         const fetchDepartment = async () => {
             try {
                 const response = await axios.get('http://127.0.0.1:5000/getDepartment');
-                console.log(response.data)
-                setDepartment(response.data);
+                console.log('Department Response:', response.data);
+                setDepartment(response.data.department); // Access specific key
             } catch (error) {
-                if (error.response) {
-                    setError(error.response.data.error);
-                } else {
-                    setError('An unexpected error occurred!');
-                }
+                console.error('Error fetching Department:', error);
+                setError(error.response?.data?.error || 'Failed to fetch Department');
             }
         };
 
+        fetchUID();
         fetchDepartment();
-
     }, []); // Empty dependency array ensures this runs only once
 
+    // Render UI
+    // return (
+    //     <div className="NavigationBox">
+    //         {error ? (
+    //             <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>
+    //         ) : (
+    //             <>
+    //                 <div className="Info">
+    //                     <div className="InfoLabel">UID:</div>
+    //                     <div className="InfoData">{UID || 'Loading...'}</div>
+    //                 </div>
+    //                 <div className="Info">
+    //                     <div className="InfoLabel">Department:</div>
+    //                     <div className="InfoData">{department || 'Loading...'}</div>
+    //                 </div>
+    //             </>
+    //         )}
+    //     </div>
+    // );
     return (
         <div className="NavigationBox">
-            <div className="Info">
-                <div className="InfoLabel">UID:</div>
-                <div className="InfoData">{UID}</div>
-            </div>
-            <div className="Info">
-                <div className="InfoLabel">Department:</div>
-                <div className="InfoData">{department}</div>
-            </div>
+            {error ? (
+                <div style={{ color: 'red', marginBottom: '10px' }}>{String(error)}</div>
+            ) : (
+                <>
+                    <div className="Info">
+                        <div className="InfoLabel">UID:</div>
+                        <div className="InfoData">{UID || 'Loading...'}</div>
+                    </div>
+                    <div className="Info">
+                        <div className="InfoLabel">Department:</div>
+                        <div className="InfoData">{department || 'Loading...'}</div>
+                    </div>
+                </>
+            )}
         </div>
-    )
-}
+    );
+
+};
 
 export default StaffNavigation;
