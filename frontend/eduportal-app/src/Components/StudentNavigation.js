@@ -46,18 +46,20 @@ const StudentNavigation = () => {
     }, []); // Empty dependency array ensures this runs only once
 
     return (
-        <div className="NavigationBox">
-            <div className="Info">
-                <div className="InfoLabel item">UID:</div>
-                <div className="InfoData item">{UID}</div>
+        <div className="NavigationBox container px-4">
+            <div className="row">
+                <div className="Info col ">
+                    <div className="InfoLabel item">UID:</div>
+                    <div className="InfoData item">{UID}</div>
+                </div>
+                <div className="Info col">
+                    <div className="InfoLabel item">GPA:</div>
+                    <div className="InfoData item">{GPA}</div>
+                </div>
+                <button type="button" className="col btn btn-primary custom-sizing">
+                    What if?
+                </button>
             </div>
-            <div className="Info">
-                <div className="InfoLabel item">GPA:</div>
-                <div className="InfoData item">{GPA}</div>
-            </div>
-            <button>
-                What if?
-            </button>
         </div>
     )
 }

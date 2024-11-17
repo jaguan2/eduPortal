@@ -17,7 +17,7 @@ function App() {
     //   <Routes>
     //     {/* Route for the login page */}
     //     <Route path="/" element={<LoginPage setIsLoggedIn={setIsLoggedIn} />} />
-
+        
     //     {/* Route for the student dashboard */}
     //     <Route
     //       path="/studentDashboard"
@@ -25,9 +25,8 @@ function App() {
     //     />
     //   </Routes>
     // </Router>
-
-    <div>
-      <WhatIfPage />
+    <div className="App">
+      <StudentDashboard/>
     </div>
   );
 }

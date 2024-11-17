@@ -1,14 +1,12 @@
-body {
-    display: flex;
-    margin: 0;
-}
-
 .ProfileContainer {
-    display: flex;
-    flex-direction: row;
+    display: flex; /* Flexbox layout */
+    align-items: center; /* Vertically center the content */
 }
 
-.Icon {
-    width: 15vw;  /* Width is 15% of the viewport width */
-    height: auto;  /* Maintain aspect ratio */
+.UserName {
+    text-align: left; /* Left align the username */
+}
+
+.ProfileImage {
+    max-width: 180px;
 }

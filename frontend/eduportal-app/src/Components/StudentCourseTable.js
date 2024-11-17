@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios'; // Import Axios
+import './StudentCourseTable.css'
 
 const CourseTable = () => {
     // api call to get data
@@ -25,7 +26,7 @@ const CourseTable = () => {
     }, []);
 
     return (
-        <table className="table">
+        <table className="table table-striped container">
             <thead>
                 <tr>
                     <th scope="col">Course</th>
