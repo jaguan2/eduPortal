@@ -290,7 +290,7 @@ def addClass():
         cursor = conn.cursor()
 
         if request.method == 'GET':
-            # Query might be wrong, but we'll leave it unchanged as per your request
+            # Query might be wrong
             query = "SELECT * FROM courses WHERE id NOT IN (SELECT course FROM taken WHERE student = '" + str(user_id) + "' );"
 
             cursor.execute(query)
@@ -418,8 +418,10 @@ def dropClass():
                 # Check if the student is enrolled in the selected course in the 'taken' table
                 check_query = (
                     "SELECT * FROM taken WHERE student = " + str(user_id) +
-                    " AND course = " + str(course_id)
+                    " AND course = " + str(course_id) +
+                    " AND semester = (SELECT semester FROM courses WHERE id = " + str(course_id) + ")"
                 )
+
                 cursor.execute(check_query)
                 taken_course = cursor.fetchone()
 
@@ -427,7 +429,8 @@ def dropClass():
                 if taken_course:
                     delete_query = (
                         "DELETE FROM taken WHERE student = " + str(user_id) +
-                        " AND course = " + str(course_id)
+                        " AND course = " + str(course_id) +
+                        " AND semester = (SELECT semester FROM courses WHERE id = " + str(course_id) + ")"
                     )
                     cursor.execute(delete_query)
 
@@ -440,9 +443,45 @@ def dropClass():
 
             return jsonify({"message": "Courses successfully dropped"}), 200
 
-#AdvisorViewStudentSummary 
-# def viewStudentSummary():
-#     query = 
+#Advisor Dashboard
+@app.route('/advisorDashboard', methods=['GET', 'POST'])
+def advisorDashboard():
+    if 'user_id' in session and 'role' in session:
+        user_id = int(session['user_id'])
+        role = session['role']
+
+        # Connect to the database
+        conn = sqlite3.connect('eduPortalDB.db')
+        cursor = conn.cursor()
+
+        # Advisor Dashboard: Only advisors can see students that their department oversees or students with specific majors
+        students_query = (" \
+            SELECT * FROM students s \
+            JOIN major m ON s.major = m.id \
+            JOIN department d ON m.department = d.id \
+            JOIN advisors a ON d.id = a.department \
+            WHERE a.id = user_id";"
+        )
+
+        cursor.execute(students_query)
+        students = cursor.fetchall()
+
+        conn.close()
+
+        if not students:
+                return jsonify({"message": "No students found for this advisor"}), 200
+        
+        students_list = [
+            {
+                "id": student[0],
+                "username": student[1],
+                "major": student[3],  # Assuming the `major` field is the student's major ID
+                # Add other relevant fields from the student table if needed
+            }
+            for student in students
+        ]
+
+        return jsonify(students_list), 200
 
 if __name__ == "__main__":
     app.run(debug=True)
