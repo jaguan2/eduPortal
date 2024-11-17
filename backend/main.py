@@ -94,6 +94,25 @@ def StudentCourses():
 
     return jsonify(student_course_json)
 
+# WORK IN PROGRESS
+@app.route("/InstructorCourses", methods=['GET'])
+def InstructorCourses():
+    # get current instructor info
+    current_user = '1'
+
+    conn = sqlite3.connect('eduPortalDB.db')
+
+    query ="select courses.courseName as course, courses.semester as semester, courses.year as year, courses.credits as credits, taken.grade as grade " + \
+            "from taken inner join courses on taken.course = courses.id " + \
+            "where taken.student = '" + current_user + "';"
+    student_course_df = pd.read_sql_query(query, conn)
+
+    student_course_json = student_course_df.to_dict(orient='records')
+
+    conn.close()
+
+    return jsonify(student_course_json)
+
 @app.route("/whatIfNCourses", methods=['POST'])
 def whatIfNCourses():
     current_user = "1"

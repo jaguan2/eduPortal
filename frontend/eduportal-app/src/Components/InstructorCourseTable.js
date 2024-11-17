@@ -25,6 +25,14 @@ const CourseTable = () => {
         fetchRows();
     }, []);
 
+    // Filer rows based on semester and year
+    const filteredRows = rows.filter(row => {
+        return (
+            (!semester || row.semester.toLowerCase() === semester.toLowerCase()) &&
+            (!year || row.year === year)
+        );
+    });
+
     return (
         <table className="table table-striped container">
             <thead>

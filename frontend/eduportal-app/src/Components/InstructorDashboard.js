@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './InstructorDashboard.css';
 import InstructorNavigation from './InstructorNavigation';
 import CourseTable from './InstructorCourseTable';
@@ -6,6 +6,13 @@ import Profile from './Profile';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const InstructorDashboard = () => {
+    const [semester, setSemester] = useState(''); // State for semester input
+    const [year, setYear] = useState(''); // State for year input
+
+    // Handle input changes
+    const handleSemesterChange = (e) => setSemester(e.target.value);
+    const handleYearChange = (e) => setYear(e.target.value);
+
     return (
         <div className="InstructorDashboard container text-center">
             {/* Row 1: Instructor Head */}
@@ -33,13 +40,23 @@ const InstructorDashboard = () => {
                 {/* Semester Input */}
                 <div className="Filter col-12 col-md-4 d-flex align-items-center">
                     <h3 className="me-2">Semester</h3>
-                    <input type="text" className="form-control" />
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={semester}
+                        onChange={handleSemesterChange}
+                    />
                 </div>
 
                 {/* Year Input */}
                 <div className="Filter col-12 col-md-4 d-flex align-items-center">
                     <h3 className="me-2">Year</h3>
-                    <input type="text" className="form-control" />
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={year}
+                        onChange={handleYearChange}
+                    />
                 </div>
 
                 {/* Search Button */}
@@ -53,7 +70,7 @@ const InstructorDashboard = () => {
             {/* Row 4: Course Table */}
             <div className="InstructorCourseList row">
                 <div className="col">
-                    <CourseTable />
+                    <CourseTable semester={semester} year={year}/>
                 </div>
             </div>
 
