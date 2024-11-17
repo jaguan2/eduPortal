@@ -193,7 +193,18 @@ def login():
     data = request.json
     role = data.get('role')
     username = data.get('username')
-    password = data.get('password') 
+    password = data.get('password')
+
+    if (role == "student"):
+        role = "students"
+    if (role == "advisor"):
+        role = "advisors"
+    if (role == "instructor"):
+        role = "instructors"
+    if (role == "System Administrator"):
+        role = "admin"
+    if (role == "Staff"):
+        role = "staff"
 
     if not username or not password:
         return jsonify({"error": "Missing username or password"}), 400

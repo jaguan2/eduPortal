@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'
 
-const Login = () => {
+const Login = ({setIsLoggedIn}) => {
 
     const [userID, setUserID] = useState('');
     const [userPass, setUserPass] = useState('');
