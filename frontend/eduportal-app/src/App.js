@@ -22,10 +22,10 @@ function App() {
           element={isLoggedIn ? <StudentDashboard /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
         />
         {/*Route for staff dashboard */}
-        <Route
+        {/* <Route
           path="/staffDashboard"
           element={isLoggedIn ? <StaffDashboard /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
-        />
+        /> */}
       </Routes>
     </Router>
   );
