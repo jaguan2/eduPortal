@@ -295,7 +295,7 @@ def view_logs():
             old_value,
             new_value,
             operation_timestamp
-        FROM operation_logs
+        FROM system_logs
         ORDER BY operation_timestamp DESC;
     """
     logs_df = pd.read_sql_query(query, conn)
@@ -303,7 +303,6 @@ def view_logs():
 
     logs_json = logs_df.to_dict(orient="records")
     return jsonify(logs_json), 200
-
 
 if __name__ == "__main__":
     app.run(debug=True)
