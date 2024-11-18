@@ -63,6 +63,29 @@ def getDepartment():
     else:
         return "Department not found", 404
 
+@app.route("/getCourseStudents", methods=['POST'])
+def getCourseStudents():
+    current_user = 1
+    role = "instructors"
+    course_id = request.get_json()
+    
+    conn = sqlite3.connect('eduPortalDB.db')
+
+    query = f'''
+        SELECT s.id as id, s.username as name, t.grade as grade 
+        from (courses c join taken t on c.id = t.course) as new_t join students s on new_t.student = s.id 
+        where c.id = ?;
+    '''
+    
+    # Execute the query using a parameterized query
+    students_df = pd.read_sql(query, conn, params=(course_id,))
+    students_list = students_df.to_dict(orient='records')
+    
+    if not students_df.empty:
+        return jsonify(students_list)
+    else:
+        return "Students not found", 404
+
 @app.route("/getName", methods=["GET"])
 def getName():
     current_user = "1"
@@ -83,7 +106,7 @@ def StudentCourses():
 
     conn = sqlite3.connect('eduPortalDB.db')
 
-    query ="select courses.courseName as course, courses.semester as semester, courses.year as year, courses.credits as credits, taken.grade as grade " + \
+    query = "select courses.courseName as course, courses.semester as semester, courses.year as year, courses.credits as credits, taken.grade as grade " + \
             "from taken inner join courses on taken.course = courses.id " + \
             "where taken.student = '" + current_user + "';"
     student_course_df = pd.read_sql_query(query, conn)
@@ -102,16 +125,16 @@ def InstructorCourses():
 
     conn = sqlite3.connect('eduPortalDB.db')
 
-    query ="select courses.courseName as course, courses.semester as semester, courses.year as year, courses.credits as credits, taken.grade as grade " + \
-            "from taken inner join courses on taken.course = courses.id " + \
-            "where taken.student = '" + current_user + "';"
-    student_course_df = pd.read_sql_query(query, conn)
+    query = "select courses.id as courseid, courses.courseName as course, courses.semester as semester, courses.year as year " + \
+            "from courses " + \
+            "where courses.instructor = ?;"
+    instructor_course_df = pd.read_sql_query(query, conn, params=(current_user,))
 
-    student_course_json = student_course_df.to_dict(orient='records')
+    instructor_course_json = instructor_course_df.to_dict(orient='records')
 
     conn.close()
 
-    return jsonify(student_course_json)
+    return jsonify(instructor_course_json)
 
 @app.route("/whatIfNCourses", methods=['POST'])
 def whatIfNCourses():

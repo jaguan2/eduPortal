@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios'; // Import Axios
 import './InstructorCourseTable.css'
 
-const CourseTable = () => {
+const CourseTable = ({ semester, year, onSelectCourses }) => {
     // api call to get data
     const [rows, setRows] = useState([]);
     const [error, setError] = useState(''); // State for handling errors
@@ -11,7 +11,8 @@ const CourseTable = () => {
     useEffect(() => {
         const fetchRows = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:5000/StudentCourses');
+                const response = await axios.get('http://127.0.0.1:5000/InstructorCourses');
+                console.log(response.data)
                 setRows(response.data);
             } catch (error) {
                 if (error.response) {
@@ -29,7 +30,7 @@ const CourseTable = () => {
     const filteredRows = rows.filter(row => {
         return (
             (!semester || row.semester.toLowerCase() === semester.toLowerCase()) &&
-            (!year || row.year === year)
+            (!parseInt(year) || parseInt(row.year) === parseInt(year))
         );
     });
 
@@ -37,6 +38,7 @@ const CourseTable = () => {
         <table className="table table-striped container">
             <thead>
                 <tr>
+                    <th scope="col">Course ID</th>
                     <th scope="col">Course</th>
                     <th scope="col">Semester</th>
                     <th scope="col">Year</th>
@@ -44,13 +46,18 @@ const CourseTable = () => {
                 </tr>
             </thead>
             <tbody>
-                {rows.map((data, index) => (
-                    <tr>
+                {filteredRows.map((data, index) => (
+                    <tr key={index}>
+                        <td scope="row">{data.courseid}</td>
                         <td scope="row">{data.course}</td>
                         <td scope="row">{data.semester}</td>
                         <td scope="row">{data.year}</td>
                         <td scope="row">
-                            <input className="form-check-input" type="checkbox"></input>
+                            <input
+                                className="form-check-input"
+                                type="checkbox"
+                                onChange={() => onSelectCourses(data.id)}
+                            />
                         </td>
                     </tr>
                 ))}

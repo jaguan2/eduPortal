@@ -1,5 +1,5 @@
 import './App.css';
-import StudentDashboard from './Components/StudentDashboard';
+import StudentDashboard from './Routes/StudentDashboard';
 import InstructorDashboard from './Components/InstructorDashboard';
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
