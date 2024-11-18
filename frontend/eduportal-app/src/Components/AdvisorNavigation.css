@@ -1,0 +1,36 @@
+/* advisorNavigation.css */
+
+.NavigationBox {
+    display: flex;
+    flex-direction: row;
+    background-color: #d7daf9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    max-width: 300px;
+    width: 100%;
+}
+
+.item {
+    padding-right: 10px;
+}
+
+.Info {
+    display: flex;
+    font-size: 18px; /* Increase text size for readability */
+    color: #333; /* Darker text color */
+    align-items: center;
+}
+
+.InfoLabel {
+    font-weight: bold; /* Make the text stand out */
+}
+
+button:hover {
+    background-color: #4c58ff; /* Darker shade on hover */
+}
+
+.custom-sizing {
+    max-width: 150px !important;
+}

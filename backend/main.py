@@ -43,7 +43,7 @@ def getID():
 @app.route("/getDepartment", methods=['GET'])
 def getDepartment():
     current_user = 1
-    role = "instructors"
+    role = "advisors"
     
     conn = sqlite3.connect('eduPortalDB.db')
 
@@ -323,7 +323,7 @@ def addClass():
 
         if request.method == 'POST':
             data = request.json
-            course_ids = data.get('course_ids')  # I expect this to be a list of course IDs
+            course_ids = data.get('course_ids')  # list of course IDs
 
             if not course_ids:
                 return jsonify({"error": "No courses selected"}), 400
@@ -333,14 +333,14 @@ def addClass():
             cursor = conn.cursor()
 
             for course_id in course_ids:
-                #checks if student is already in the same course (hopefully)
+                # checks if student is already in the same course (hopefully)
                 query = (
-                    "SELECT * FROM taken WHERE student = " + user_id + 
-                    " AND course = " + course_id + 
-                    " AND semester = (SELECT semester FROM courses WHERE id = " + course_id + ")"
+                    "SELECT * FROM taken WHERE student = " + str(user_id) + 
+                    " AND course = " + str(course_id) + 
+                    " AND semester = (SELECT semester FROM courses WHERE id = " + str(course_id) + ")"
                 )
 
-                cursor.execute(query, (user_id, course_id, course_id))  # Assuming `course_id` matches the ID in the courses table
+                cursor.execute(query)  # No need to pass parameters here as they are already concatenated in the query
                 
                 taken_course = cursor.fetchone()
 
@@ -349,17 +349,15 @@ def addClass():
                     return jsonify({"error": f"Student has already taken course {course_id} in this semester"}), 400
 
                 # If not enrolled, insert the course into the 'taken' table
-                insert_course = (
-                    query = "INSERT INTO taken(student = " + user_id +", course = "+ course_id +")"
-                )
-                cursor.execute(insert_course, (user_id, course_id))
-            
+                insert_course = "INSERT INTO taken(student, course) VALUES (" + str(user_id) + ", " + str(course_id) + ")"
+                cursor.execute(insert_course)
+
             # Commit changes and close the connection
             conn.commit()
             conn.close()
 
             return jsonify({"message": "Courses successfully added"}), 200
-        
+
 
 @app.route('/dropClass', methods=['GET', 'POST'])
 def dropClass():
@@ -419,7 +417,7 @@ def dropClass():
                 check_query = (
                     "SELECT * FROM taken WHERE student = " + str(user_id) +
                     " AND course = " + str(course_id) +
-                    " AND semester = (SELECT semester FROM courses WHERE id = " + str(course_id) + ")"
+                    " AND semester = (SELECT semester FROM courses WHERE id = " + str(course_id) + ");"
                 )
 
                 cursor.execute(check_query)
@@ -443,45 +441,36 @@ def dropClass():
 
             return jsonify({"message": "Courses successfully dropped"}), 200
 
-#Advisor Dashboard
-@app.route('/advisorDashboard', methods=['GET', 'POST'])
-def advisorDashboard():
-    if 'user_id' in session and 'role' in session:
-        user_id = int(session['user_id'])
-        role = session['role']
+@app.route('/advisorStudentList', methods=['GET'])
+def advisorStudentList():
 
-        # Connect to the database
-        conn = sqlite3.connect('eduPortalDB.db')
-        cursor = conn.cursor()
+    current_user = 1 #hardcoded
+    
+    role = "advisor"  
+    
+    # Connect to the database
+    conn = sqlite3.connect('eduPortalDB.db')
+    cursor = conn.cursor()
 
-        # Advisor Dashboard: Only advisors can see students that their department oversees or students with specific majors
-        students_query = (" \
-            SELECT * FROM students s \
-            JOIN major m ON s.major = m.id \
-            JOIN department d ON m.department = d.id \
-            JOIN advisors a ON d.id = a.department \
-            WHERE a.id = user_id";"
-        )
+    # Get the students for the advisor using the current_user (advisor id)
+    students_query = (" \
+        select s.id as id, s.username as username, m.majorName as major from (students s join major m on s.major = m.id) \
+        as new_s join advisors a on new_s.department = a.department \
+        WHERE a.id = " + str(current_user) + ";")
+    
+    # cursor.execute(students_query, (current_user,))
+    # students = cursor.fetchall()
 
-        cursor.execute(students_query)
-        students = cursor.fetchall()
+    students_df = pd.read_sql(students_query, conn)
 
-        conn.close()
+    students_json = students_df.to_dict(orient='records')
 
-        if not students:
-                return jsonify({"message": "No students found for this advisor"}), 200
-        
-        students_list = [
-            {
-                "id": student[0],
-                "username": student[1],
-                "major": student[3],  # Assuming the `major` field is the student's major ID
-                # Add other relevant fields from the student table if needed
-            }
-            for student in students
-        ]
+    conn.close()
 
-        return jsonify(students_list), 200
+    if not students_json:
+        return jsonify({"message": "No students found for this advisor"}), 200
+
+    return jsonify(students_json), 200
 
 if __name__ == "__main__":
     app.run(debug=True)

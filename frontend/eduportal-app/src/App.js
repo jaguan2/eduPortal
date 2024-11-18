@@ -6,28 +6,32 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-d
 
 import LoginPage from './Routes/LoginPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import AdvisorDashboard from './Components/AdvisorDashboard';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
-    <Router>
-      <Routes>
-        {/* Route for the login page */}
-        <Route path="/" element={<LoginPage setIsLoggedIn={setIsLoggedIn} />} />
+    // <Router>
+    //   <Routes>
+    //     {/* Route for the login page */}
+    //     <Route path="/" element={<LoginPage setIsLoggedIn={setIsLoggedIn} />} />
 
-        {/* Route for the student dashboard */}
-        <Route
-          path="/studentDashboard"
-          element={isLoggedIn ? <StudentDashboard /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
-        />
-        {/*Route for staff dashboard */}
-        {/* <Route
-          path="/staffDashboard"
-          element={isLoggedIn ? <StaffDashboard /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
-        /> */}
-      </Routes>
-    </Router>
+    //     {/* Route for the student dashboard */}
+    //     <Route
+    //       path="/studentDashboard"
+    //       element={isLoggedIn ? <StudentDashboard /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
+    //     />
+    //     {/*Route for staff dashboard */}
+    //     {/* <Route
+    //       path="/staffDashboard"
+    //       element={isLoggedIn ? <StaffDashboard /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
+    //     /> */}
+    //   </Routes>
+    // </Router>
+    <div className="App">
+      <AdvisorDashboard />
+    </div>
   );
 }
 
