@@ -1,7 +1,7 @@
-// import React, { useState, useEffect } from 'react';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import axios from 'axios'; // Import Axios
-// import './InstructorCourseTable.css'
+import React, { useState, useEffect } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios'; // Import Axios
+import './InstructorCourseTable.css'
 
 const CourseTable = ({ semester, year, onSelectCourses }) => {
     // api call to get data
@@ -66,4 +66,4 @@ const CourseTable = ({ semester, year, onSelectCourses }) => {
     )
 }
 
-// export default CourseTable;
+export default CourseTable;
