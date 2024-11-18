@@ -67,7 +67,10 @@ def getDepartment():
 def getCourseStudents():
     current_user = 1
     role = "instructors"
-    course_id = request.get_json()
+    data = request.get_json()
+    course_id = data.get('id')
+
+    print(course_id)
     
     conn = sqlite3.connect('eduPortalDB.db')
 
@@ -82,6 +85,7 @@ def getCourseStudents():
     students_list = students_df.to_dict(orient='records')
     
     if not students_df.empty:
+        print(students_list)
         return jsonify(students_list)
     else:
         return "Students not found", 404

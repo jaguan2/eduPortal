@@ -97,13 +97,6 @@ const InstructorDashboard = () => {
                     <CourseTable semester={semester} year={year}/>
                 </div>
             </div>
-
-            {/* Row 5: Submit Button */}
-            <div className="row SubmitButton">
-                <button type="submit" className="col btn btn-primary custom-sizing">
-                    Submit
-                </button>
-            </div>
         </div>
     );
 };

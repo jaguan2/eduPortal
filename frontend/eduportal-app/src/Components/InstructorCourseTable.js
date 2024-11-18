@@ -6,6 +6,10 @@ import './InstructorCourseTable.css'
 const CourseTable = ({ semester, year, onSelectCourses }) => {
     // api call to get data
     const [rows, setRows] = useState([]);
+    // const [selectedCourse, setSelectedCourse] = null([]);
+    const [showNewTable, setShowNewTable] = useState(false);
+    const [courseStudents, setCourseStudents] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(''); // State for handling errors
 
     useEffect(() => {
@@ -34,35 +38,88 @@ const CourseTable = ({ semester, year, onSelectCourses }) => {
         );
     });
 
+    const handleShowNewTable = async (courseId) => {
+        setLoading(true);
+        setShowNewTable(true);
+        setCourseStudents([]);
+        try {
+            const response = await axios.post('http://127.0.0.1:5000/getCourseStudents', {id: courseId});
+
+            if (response.data && response.data.length > 0) {
+                setCourseStudents(response.data);
+            } else {
+                setCourseStudents([]);
+            }
+        } catch (error) {
+            console.error('Erorr fetching data', error);
+            setCourseStudents([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleBackToTable = () => {
+        setShowNewTable(false);
+    }
+
     return (
-        <table className="table table-striped container">
-            <thead>
-                <tr>
-                    <th scope="col">Course ID</th>
-                    <th scope="col">Course</th>
-                    <th scope="col">Semester</th>
-                    <th scope="col">Year</th>
-                    <th scope="col">Select</th>
-                </tr>
-            </thead>
-            <tbody>
-                {filteredRows.map((data, index) => (
-                    <tr key={index}>
-                        <td scope="row">{data.courseid}</td>
-                        <td scope="row">{data.course}</td>
-                        <td scope="row">{data.semester}</td>
-                        <td scope="row">{data.year}</td>
-                        <td scope="row">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={() => onSelectCourses(data.id)}
-                            />
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
+        <div>
+            {
+                showNewTable ? (
+                    <div>
+                        <table className="table table-striped container">
+                        <thead>
+                            <tr>
+                                <th scope="col">Student ID</th>
+                                <th scope="col">Student Name</th>
+                                <th scope="col">Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {courseStudents.map((data, index) => (
+                                <tr key={index}>
+                                    <td scope="row">{data.id}</td>
+                                    <td scope="row">{data.name}</td>
+                                    <td scope="row">{data.grade}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                        </table>
+                        <button onClick={handleBackToTable}>Back</button>
+                    </div>
+                ) : (
+                    <div>
+                        <table className="table table-striped container">
+                        <thead>
+                            <tr>
+                                <th scope="col">Course ID</th>
+                                <th scope="col">Course</th>
+                                <th scope="col">Semester</th>
+                                <th scope="col">Year</th>
+                                <th scope="col">Select</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredRows.map((data, index) => (
+                                <tr key={index}>
+                                    <td scope="row">{data.courseid}</td>
+                                    <td scope="row">{data.course}</td>
+                                    <td scope="row">{data.semester}</td>
+                                    <td scope="row">{data.year}</td>
+                                    <td scope="row">
+                                        <button
+                                            onClick={() => handleShowNewTable(data.courseid)}
+                                        />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                        </table>
+                    </div>
+                )
+            }
+        </div>
+
     )
 }
 

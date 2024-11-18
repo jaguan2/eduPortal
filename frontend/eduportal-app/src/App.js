@@ -36,10 +36,11 @@ function App() {
     //     />
 
     //   </Routes>
-    // </Router>
+    // </Router> 
+
     <div className="App">
-      {/* <InstructorDashboard/> */}
-      {/* <StudentDashboard/> */}
+        {/* <InstructorDashboard/> */}
+        <StudentDashboard/>
       <SystemAdminDashboard/>
     </div>
   );

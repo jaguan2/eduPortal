@@ -32,13 +32,16 @@ function LoginPage({ setIsLoggedIn, setUserRole }) {
                 setUserRole(role);
 
                 navigate(`/${role}Dashboard`);
-            } else {
-                console.error('Login failed:', response.data.error);
+            } else if (response.status === 401){
+                console.error('Invalid credentials failed:', response.data.error);
+                setError(response.data.error);
+            } else if (response.status === 404){
+                console.error('User not found', response.data.error);
                 setError(response.data.error);
             }
         } catch (err) {
             console.error('Error:', err.response?.data || err.message);
-            setError(err.response?.data || 'An error occurred');
+            setError(err.response?.data || 'help');
         }
     };
 
