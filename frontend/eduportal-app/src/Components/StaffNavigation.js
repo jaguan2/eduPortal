@@ -1,92 +1,51 @@
+
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Import Axios
-import './StaffNavigation.css';
-//thank you grace and kelly
+import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
+
 const StaffNavigation = () => {
-    // api call to get data
-    const [UID, setUID] = useState(''); // State for the UID
-    const [department, setDepartment] = useState(''); // State for the GPA
-    const [error, setError] = useState(''); // State for handling errors
+    const [UID, setUID] = useState('');
+    const [department, setDepartment] = useState('');
+    const [error, setError] = useState('');
 
-    // Use an API call to fetch the user's UID and department
     useEffect(() => {
-        // const fetchUID = async () => {
-        //     try {
-        //         const response = await axios.get('http://127.0.0.1:5000/getID');
-        //         console.log('UID Response:', response.data);
-        //         setUID(response.data.uid); // Access specific key
-        //     } catch (error) {
-        //         console.error('Error fetching UID:', error);
-        //         setError(error.response?.data?.error || 'Failed to fetch UID');
-        //     }
-        // };
-
-        const fetchUID = async () => {
+        const fetchUserData = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:5000/getID');
-                if (response.data.uid) {
-                    setUID(response.data.uid);
-                } else {
-                    setError(response.data.error || "Unknown error");
-                }
+                const uidResponse = await axios.get('http://127.0.0.1:5000/getID');
+                const departmentResponse = await axios.get('http://127.0.0.1:5000/getDepartment');
+                setUID(uidResponse.data.uid);
+                setDepartment(departmentResponse.data.department);
             } catch (error) {
-                setError(error.response?.data?.error || "Failed to fetch UID");
+                setError('Failed to fetch user data.');
             }
         };
+        fetchUserData();
+    }, []);
 
-        const fetchDepartment = async () => {
-            try {
-                const response = await axios.get('http://127.0.0.1:5000/getDepartment');
-                console.log('Department Response:', response.data);
-                setDepartment(response.data.department); // Access specific key
-            } catch (error) {
-                console.error('Error fetching Department:', error);
-                setError(error.response?.data?.error || 'Failed to fetch Department');
-            }
-        };
-
-        fetchUID();
-        fetchDepartment();
-    }, []); // Empty dependency array ensures this runs only once
-
-    // Render UI
-    // return (
-    //     <div className="NavigationBox">
-    //         {error ? (
-    //             <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>
-    //         ) : (
-    //             <>
-    //                 <div className="Info">
-    //                     <div className="InfoLabel">UID:</div>
-    //                     <div className="InfoData">{UID || 'Loading...'}</div>
-    //                 </div>
-    //                 <div className="Info">
-    //                     <div className="InfoLabel">Department:</div>
-    //                     <div className="InfoData">{department || 'Loading...'}</div>
-    //                 </div>
-    //             </>
-    //         )}
-    //     </div>
-    // );
     return (
-        <div className="NavigationBox">
-            {error ? (
-                <div style={{ color: 'red', marginBottom: '10px' }}>{String(error)}</div>
-            ) : (
-                <>
-                    <div className="Info">
-                        <div className="InfoLabel">UID:</div>
-                        <div className="InfoData">{UID || 'Loading...'}</div>
-                    </div>
-                    <div className="Info">
-                        <div className="InfoLabel">Department:</div>
-                        <div className="InfoData">{department || 'Loading...'}</div>
-                    </div>
-                </>
-            )}
+        <div className="container mt-3">
+            <div className="alert alert-info">
+                <h4>Staff Information</h4>
+                <p>UID: {UID || 'Loading...'}</p>
+                <p>Department: {department || 'Loading...'}</p>
+            </div>
+            {error && <div className="alert alert-danger">{error}</div>}
+            <nav className="mt-3">
+                <ul className="list-group">
+                    <li className="list-group-item">
+                        <Link to="/manage-courses">Manage Courses</Link>
+                    </li>
+                    <li className="list-group-item">
+                        <Link to="/assign-instructors">Assign Instructors</Link>
+                    </li>
+                    <li className="list-group-item">
+                        <Link to="/manage-assign">Manage Courses & Assign Instructors</Link>
+                    </li>
+                </ul>
+            </nav>
         </div>
     );
-
 };
 
 export default StaffNavigation;
