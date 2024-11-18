@@ -3,7 +3,7 @@ import Profile from '../Components/Profile';
 import StaffNavigation from '../Components/StaffNavigation';
 
 const StaffDashboard = () => {
-    return(
+    return (
         <div className="StaffDashboard">
             <Profile/>
             <StaffNavigation/>

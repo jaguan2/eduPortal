@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'; // Import Axios
-import './StaffNavigation.css';
-//thank you grace and kelly
+import './SystemAdminNavigation.css';
+
 const SystemAdminNavigation = () => {
     // api call to get data
     const [UID, setUID] = useState(''); // State for the UID
@@ -46,14 +46,16 @@ const SystemAdminNavigation = () => {
     }, []); // Empty dependency array ensures this runs only once
 
     return (
-        <div className="NavigationBox">
-            <div className="Info">
-                <div className="InfoLabel">UID:</div>
-                <div className="InfoData">{UID}</div>
-            </div>
-            <div className="Info">
-                <div className="InfoLabel">Department:</div>
-                <div className="InfoData">{department}</div>
+        <div className="NavigationBox container px-4">
+            <div className="row d-flex">
+                <div className="Info col">
+                    <div className="InfoLabel">UID:</div>
+                    <div className="InfoData">{UID}</div>
+                </div>
+                <div className="Info col">
+                    <div className="InfoLabel item">Dept:</div>
+                    <div className="InfoData item">{department}</div>
+                </div>
             </div>
         </div>
     )

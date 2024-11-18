@@ -7,6 +7,7 @@ import LoginPage from './Routes/LoginPage';
 import StudentDashboard from './Routes/StudentDashboard';
 import WhatIfPage from './Routes/WhatIfPage';
 import InstructorDashboard from './Routes/InstructorDashboard';
+import SystemAdminDashboard from './Routes/SystemAdminDashboard';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -37,8 +38,9 @@ function App() {
     //   </Routes>
     // </Router>
     <div className="App">
-      <InstructorDashboard/>
+      {/* <InstructorDashboard/> */}
       {/* <StudentDashboard/> */}
+      <SystemAdminDashboard/>
     </div>
   );
 }

@@ -99,6 +99,26 @@ def getName():
 
     return username
 
+@app.route("/getSystemLogs", methods=['GET'])
+def getSystemLogs():
+    current_user = "1"
+    role="admin"
+
+    conn = sqlite3.connect('eduPortalDB.db')
+
+    query = "select operation_timestamp, user_id, operation_type, table_name, affected_data " + \
+            "from system_logs " + \
+            "where user_id = ?;"
+    
+    # Execute the query using a parameterized query
+    systemLogs_df = pd.read_sql(query, conn, params=(current_user,))
+    
+    if not systemLogs_df.empty:
+        system_logs = systemLogs_df.to_dict(orient='records')
+        return jsonify(system_logs)
+    else:
+        return "No logs found for the user", 404
+
 @app.route("/StudentCourses", methods=['GET'])
 def StudentCourses():
     # get current student info
