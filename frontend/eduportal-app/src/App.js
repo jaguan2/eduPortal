@@ -14,35 +14,43 @@ function App() {
   const [userRole, setUserRole] = useState(null);
 
   return (
-    // <Router>
-    //   <Routes>
-    //     {/* Route for the login page */}
-    //     <Route path="/" element={<LoginPage setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole}/>} />
+    <Router>
+      <Routes>
+        {/* Route for the login page */}
+        <Route path="/" element={<LoginPage setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole}/>} />
         
-    //     {/* Route for the student dashboard */}
-    //     <Route
-    //       path="/studentDashboard"
-    //       element={isLoggedIn ? <StudentDashboard /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
-    //     />
+        {/* Route for the student dashboard */}
+        <Route
+          path="/studentDashboard"
+          element={isLoggedIn ? <StudentDashboard /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
+        />
 
-    //     <Route
-    //       path="/instructorDashboard"
-    //       element={isLoggedIn ? <InstructorDashboard/> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
-    //     />
+        {/* Route for the instructor dashboard */}
+        <Route
+          path="/instructorDashboard"
+          element={isLoggedIn ? <InstructorDashboard/> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
+        />
 
-    //     <Route 
-    //       path="/WhatIfPage"
-    //       element={<WhatIfPage />}
-    //     />
+        {/* Route for the system admin dashboard */}
+        <Route
+          path="/systemAdminDashboard"
+          element={isLoggedIn ? <SystemAdminDashboard/> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
+        />
 
-    //   </Routes>
-    // </Router> 
+        {/* Route for the what if page */}
+        <Route 
+          path="/WhatIfPage"
+          element={<WhatIfPage />}
+        />
 
-    <div className="App">
-        {/* <InstructorDashboard/> */}
-        <StudentDashboard/>
-      <SystemAdminDashboard/>
-    </div>
+      </Routes>
+    </Router> 
+
+    // <div className="App">
+    //   {/* <InstructorDashboard/> */}
+    //   {/* <StudentDashboard/> */}
+    //   <SystemAdminDashboard/>
+    // </div>
   );
 }
 
