@@ -11,12 +11,12 @@ const StudentDashboard = () => {
             {/* Row 1: Student Head */}
             <div className="StudentHead row align-items-center mb-5">
                 {/* Profile */}
-                <div className="col-12 col-md-4 d-flex justify-content-md-start"> {/* col-12 for small screens, col-md-4 for medium and up */}
+                <div className="col"> {/* col-12 for small screens, col-md-4 for medium and up */}
                     <Profile />
                 </div>
 
                 {/* Student Navigation */}
-                <div className="col-12 col-md-8 d-flex justify-content-md-end"> {/* col-12 for small screens, col-md-8 for medium and up */}
+                <div className="col d-flex justify-content-end"> {/* col-12 for small screens, col-md-8 for medium and up */}
                     <StudentNavigation />
                 </div>
             </div>

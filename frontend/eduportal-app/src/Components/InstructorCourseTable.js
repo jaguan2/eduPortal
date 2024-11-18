@@ -107,7 +107,7 @@ const CourseTable = ({ semester, year, onSelectCourses }) => {
                                     <td scope="row">{data.semester}</td>
                                     <td scope="row">{data.year}</td>
                                     <td scope="row">
-                                        <button
+                                        <button className="btn btn-outline-primary"
                                             onClick={() => handleShowNewTable(data.courseid)}
                                         />
                                     </td>

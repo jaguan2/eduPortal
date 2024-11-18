@@ -46,14 +46,16 @@ const AdvisorNavigation = () => {
     }, []); // Empty dependency array ensures this runs only once
 
     return (
-        <div className="NavigationBox">
-            <div className="Info">
-                <div className="InfoLabel">UID:</div>
-                <div className="InfoData">{UID}</div>
-            </div>
-            <div className="Info">
-                <div className="InfoLabel">Department:</div>
-                <div className="InfoData">{department}</div>
+        <div className="NavigationBox container px-4">
+            <div colName="col d-flex">
+                <div className="Info col">
+                    <div className="InfoLabel item">UID:</div>
+                    <div className="InfoData item">{UID}</div>
+                </div>
+                <div className="Info col">
+                    <div className="InfoLabel item">Department:</div>
+                    <div className="InfoData item">{department}</div>
+                </div>
             </div>
         </div>
     )

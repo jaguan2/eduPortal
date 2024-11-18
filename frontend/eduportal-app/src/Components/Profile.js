@@ -31,13 +31,11 @@ const Profile = () => {
     
     return (
         <div className="ProfileContainer container">
-            <div className="row text-center profile">
-                {/* Profile Image - Takes up 5 columns on large screens, 12 columns on small screens */}
-                <div className="ProfileImage col-12 col-md-5">
+            <div className="col Profile d-flex align-items-center">
+                <div className="ProfileImage col-4">
                     <img className="img-fluid" src={UserProfilePicture} alt="Profile" />
                 </div>
-                {/* User Name - Takes up 7 columns on large screens, 12 columns on small screens */}
-                <div className="UserName col-12 col-md-7 d-flex align-items-center">
+                <div className="UserName col-3 d-flex align-items-center">
                     {error ? (
                         <div style={{ color: 'red' }}>
                             {error} {/* Show error if there's an issue */}

@@ -1,7 +1,7 @@
 .InstructorDashboard {
     background-color: #f9f9f9;
     padding: 20px;
-    border-radius: 10px;
+    margin-top: 5%;
 }
 
 .InstructorHead {
@@ -25,11 +25,6 @@
 
 .InstructoNavigation {
     flex-grow: 1 !important;
-}
-
-.SubmitButton {
-    justify-content: right;
-    margin-top: 30px;
 }
 
 .Filter {

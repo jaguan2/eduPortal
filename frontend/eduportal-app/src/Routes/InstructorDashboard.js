@@ -44,57 +44,59 @@ const InstructorDashboard = () => {
     };
 
     return (
-        <div className="InstructorDashboard container text-center">
-            {/* Row 1: Instructor Head */}
-            <div className="InstructorHead row align-items-center mb-5">
-                {/* Profile */}
-                <div className="col-12 col-md-4"> {/* col-12 for small screens, col-md-4 for medium and up */}
-                    <Profile />
+        <div className="InstructorDashboard d-flex align-items-center text-center">
+            <div className="container text-center">
+                {/* Row 1: Instructor Head */}
+                <div className="InstructorHead row align-items-center mb-5">
+                    {/* Profile */}
+                    <div className="col">
+                        <Profile />
+                    </div>
+
+                    {/* Instructor Navigation */}
+                    <div className="col d-flex justify-content-end">
+                        <InstructorNavigation />
+                    </div>
+                </div>
+                
+                {/* Row 2: Course Title */}
+                <div className="InstructorCoursesTitle row mb-3">
+                    <div className="col">
+                        <h3>Course List</h3>
+                    </div>
                 </div>
 
-                {/* Instructor Navigation */}
-                <div className="col-12 col-md-8 d-flex justify-content-end"> {/* col-12 for small screens, col-md-8 for medium and up */}
-                    <InstructorNavigation />
-                </div>
-            </div>
-            
-            {/* Row 2: Course Title */}
-            <div className="InstructorCoursesTitle row mb-3">
-                <div className="col">
-                    <h3>Course List</h3>
-                </div>
-            </div>
+                {/* Row 3: Filter Options */}
+                <div className="row mb-3 d-flex align-items-center">
+                    {/* Semester Input */}
+                    <div className="Filter col-12 col-md-4 d-flex align-items-center">
+                        <h3 className="me-2">Semester</h3>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={semester}
+                            onChange={handleSemesterChange}
+                        />
+                    </div>
 
-            {/* Row 3: Filter Options */}
-            <div className="row mb-3 d-flex flex-nowrap align-items-center">
-                {/* Semester Input */}
-                <div className="Filter col-12 col-md-4 d-flex align-items-center">
-                    <h3 className="me-2">Semester</h3>
-                    <input
-                        type="text"
-                        className="form-control"
-                        value={semester}
-                        onChange={handleSemesterChange}
-                    />
+                    {/* Year Input */}
+                    <div className="Filter col-12 col-md-4 d-flex align-items-center">
+                        <h3 className="me-2">Year</h3>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={year}
+                            onChange={handleYearChange}
+                        />
+                    </div>
                 </div>
 
-                {/* Year Input */}
-                <div className="Filter col-12 col-md-4 d-flex align-items-center">
-                    <h3 className="me-2">Year</h3>
-                    <input
-                        type="text"
-                        className="form-control"
-                        value={year}
-                        onChange={handleYearChange}
-                    />
-                </div>
-            </div>
-
-            {/* Row 4: Course Table */}
-            <div className="InstructorCourseList row">
-                <div className="col">
-                    {/* Pass semester and year to CourseTable */}
-                    <CourseTable semester={semester} year={year}/>
+                {/* Row 4: Course Table */}
+                <div className="InstructorCourseList row">
+                    <div className="col">
+                        {/* Pass semester and year to CourseTable */}
+                        <CourseTable semester={semester} year={year}/>
+                    </div>
                 </div>
             </div>
         </div>

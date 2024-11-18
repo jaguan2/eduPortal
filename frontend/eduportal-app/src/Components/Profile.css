@@ -3,10 +3,10 @@
     align-items: center; /* Vertically center the content */
 }
 
-.UserName {
-    text-align: left; /* Left align the username */
+.ProfileImage {
+    max-width: 150px;
 }
 
-.ProfileImage {
-    max-width: 180px;
+.Profile {
+    gap: 28px;
 }
