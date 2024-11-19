@@ -1,5 +1,5 @@
 import React from 'react';
-import Profile from '../Components/Profile';
+import StaffProfile from '../Components/StaffProfile';
 import StaffNavigation from '../Components/StaffNavigation';
 import DepartmentCheck from '../Components/StaffDepartmentCheck'; // Check authorization
 
@@ -9,7 +9,7 @@ const StaffDashboard = () => {
 
     return (
         <div className="StaffDashboard">
-            <Profile />
+            <StaffProfile />
             <StaffNavigation />
             <DepartmentCheck userId={userId} departmentId={departmentId} />
         </div>

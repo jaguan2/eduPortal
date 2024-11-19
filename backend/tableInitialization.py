@@ -60,7 +60,9 @@ courseTableQuery = '''create table if not exists courses(
     classTime VARCHAR(255),
     classDay VARCHAR(5),
     instructor INTEGER,
-    FOREIGN KEY (instructor) REFERENCES instructors(id)
+    department INTEGER,
+    FOREIGN KEY (instructor) REFERENCES instructors(id),
+    FOREIGN KEY (department) REFERENCES department(id)
     );'''
 conn.execute(courseTableQuery)
 

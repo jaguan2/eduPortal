@@ -1,0 +1,12 @@
+.ProfileContainer {
+    display: flex; /* Flexbox layout */
+    align-items: center; /* Vertically center the content */
+}
+
+.ProfileImage {
+    max-width: 150px;
+}
+
+.Profile {
+    gap: 28px;
+}
