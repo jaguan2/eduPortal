@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import {
+    Container,
+    Typography,
+    Alert,
+    Button,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Box,
+} from '@mui/material';
 
 const StaffManageInstructorsTable = () => {
     const [instructors, setInstructors] = useState([]); // State to store instructor data
@@ -12,7 +25,12 @@ const StaffManageInstructorsTable = () => {
             try {
                 // Fetch data from the backend route
                 const response = await axios.get('http://127.0.0.1:5000/getStaffManageInstructors');
-                setInstructors(response.data); // Update state with the data
+                // Pad instructor IDs
+                const paddedInstructors = response.data.map((instructor) => ({
+                    ...instructor,
+                    instructor_id: `U33${instructor.instructor_id.toString().padStart(6, '0')}`,
+                }));
+                setInstructors(paddedInstructors); // Update state with padded data
             } catch (err) {
                 setError('Failed to fetch instructors.'); // Handle errors
             }
@@ -22,39 +40,52 @@ const StaffManageInstructorsTable = () => {
     }, []);
 
     return (
-        <div className="container mt-5">
-            <h1 className="text-center mb-4">Instructors in Your Department</h1>
-            {error && <div className="alert alert-danger">{error}</div>}
+        <Container style={{ marginTop: '2rem' }}>
+            {/* Header */}
+            <Typography variant="h4" align="center" gutterBottom>
+                Instructors
+            </Typography>
+
+            {/* Error Alert */}
+            {error && (
+                <Alert severity="error" style={{ marginBottom: '1rem' }}>
+                    {error}
+                </Alert>
+            )}
 
             {/* Toggle Button */}
-            <div className="text-end mb-3">
-                <button
-                    className="btn btn-sm btn-outline-primary"
+            <Box textAlign="end" marginBottom={2}>
+                <Button
+                    variant="outlined"
+                    size="small"
                     onClick={() => setShowPasswords((prev) => !prev)}
                 >
-                    {showPasswords ? "Hide Passwords" : "Show Passwords"}
-                </button>
-            </div>
+                    {showPasswords ? 'Hide Passwords' : 'Show Passwords'}
+                </Button>
+            </Box>
 
-            <table className="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th scope="col">Instructor ID</th>
-                        <th scope="col">Username</th>
-                        <th scope="col">Password</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {instructors.map((instructor) => (
-                        <tr key={instructor.instructor_id}>
-                            <td>{instructor.instructor_id}</td>
-                            <td>{instructor.username}</td>
-                            <td>{showPasswords ? instructor.password : "******"}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+            {/* Instructors Table */}
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Instructor ID</strong></TableCell>
+                            <TableCell><strong>Username</strong></TableCell>
+                            <TableCell><strong>Password</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {instructors.map((instructor) => (
+                            <TableRow key={instructor.instructor_id}>
+                                <TableCell>{instructor.instructor_id}</TableCell>
+                                <TableCell>{instructor.username}</TableCell>
+                                <TableCell>{showPasswords ? instructor.password : '******'}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Container>
     );
 };
 

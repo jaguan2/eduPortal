@@ -1,118 +1,117 @@
 import React, { useState } from 'react';
+import {
+    Container,
+    Typography,
+    Box,
+    Grid,
+    Button,
+    ButtonGroup,
+    Alert,
+    Paper,
+    CircularProgress,
+} from '@mui/material';
 import Profile from '../Components/SystemAdminProfile';
-import SystemAdminNavigation from '../Components/SystemAdminNavigation';
 import LogsTable from '../Components/SystemAdminLogsTable';
 import SystemAdminGPAStatisticsTable from '../Components/SystemAdminGPAStatisticsTable';
 import DepartmentGPATable from '../Components/SystemAdminDepartmentGPATable';
 import SystemAdminSemesterCourseStatsTable from '../Components/SystemAdminSemesterCourseStatsTable';
 import InstructorStudentsByMajorTable from '../Components/SystemInstructorByStudentsMajorTable';
 import ListStudentsByMajorTable from '../Components/SystemAdminStudentsByMajorTable';
-import './SystemAdminDashboard.css';
-
+import SystemAdminNavigation from '../Components/SystemAdminNavigation';
 const SystemAdminDashboard = () => {
-    const [activeTab, setActiveTab] = useState('logs'); // Track which table is active
+    const [activeTab, setActiveTab] = useState('logs'); // Track active page
+    const [error, setError] = useState('');
+    const [UID, setUID] = useState('Admin123');
+    const [department, setDepartment] = useState('Admin Department');
 
-    // Logout function to redirect to login page
     const handleLogout = () => {
         window.location.href = '/'; // Redirect to login page
     };
 
     return (
-        <div className="SystemAdminDashboard container text-center">
-            {/* Row 1: System Admin Head */}
-            <div className="SystemAdminHead row align-items-center mb-5">
-                {/* Profile */}
-                <div className="col-12 col-md-4 d-flex justify-content-md-start">
+        <Container style={{ marginTop: '2rem' }}>
+            {/* Header Section: Profile, UID, Department, and Logout */}
+            <Grid container spacing={2} alignItems="center" marginBottom={4}>
+                <Grid item xs={12} md={4}>
                     <Profile />
-                </div>
-
-                {/* Logout Button */}
-                <div className="col-12 col-md-8 d-flex justify-content-md-end">
-                    <button
-                        className="btn btn-danger"
-                        onClick={handleLogout}
-                    >
+                </Grid>
+                <Grid item xs={6} md={4}>
+                    <Box>
+                        <Typography variant="subtitle1" color="textSecondary">
+                            UID:
+                        </Typography>
+                        <Typography variant="body1">
+                            {UID || <CircularProgress size={20} />}
+                        </Typography>
+                    </Box>
+                    <Box marginTop={2}>
+                        <Typography variant="subtitle1" color="textSecondary">
+                            Department:
+                        </Typography>
+                        <Typography variant="body1">
+                            {department || <CircularProgress size={20} />}
+                        </Typography>
+                    </Box>
+                </Grid>
+                <Grid item xs={6} md={4} textAlign="end">
+                    <Button variant="contained" color="error" onClick={handleLogout}>
                         Log Out
-                    </button>
-                </div>
-            </div>
+                    </Button>
+                </Grid>
+            </Grid>
 
-            {/* Row 2: Button Toggle */}
-            <div className="row mb-4 justify-content-center">
-                <div className="btn-group">
-                    <button
-                        className={`btn btn-outline-primary ${activeTab === 'logs' ? 'active' : ''}`}
+            {/* Navigation Buttons */}
+            <Box textAlign="center" marginBottom={4}>
+                <ButtonGroup variant="outlined" color="primary">
+                    <Button
+                        variant={activeTab === 'logs' ? 'contained' : 'outlined'}
                         onClick={() => setActiveTab('logs')}
                     >
                         Logs
-                    </button>
-                    <button
-                        className={`btn btn-outline-secondary ${activeTab === 'gpa' ? 'active' : ''}`}
+                    </Button>
+                    <Button
+                        variant={activeTab === 'gpa' ? 'contained' : 'outlined'}
                         onClick={() => setActiveTab('gpa')}
                     >
                         Major GPA Rankings
-                    </button>
-                    <button
-                        className={`btn btn-outline-success ${activeTab === 'department_gpa' ? 'active' : ''}`}
+                    </Button>
+                    <Button
+                        variant={activeTab === 'department_gpa' ? 'contained' : 'outlined'}
                         onClick={() => setActiveTab('department_gpa')}
                     >
                         Department GPA Rankings
-                    </button>
-                    <button
-                        className={`btn btn-outline-info ${activeTab === 'course_stats' ? 'active' : ''}`}
+                    </Button>
+                    <Button
+                        variant={activeTab === 'course_stats' ? 'contained' : 'outlined'}
                         onClick={() => setActiveTab('course_stats')}
                     >
                         Semester Course Statistics
-                    </button>
-                    <button
-                        className={`btn btn-outline-warning ${activeTab === 'instructor_students' ? 'active' : ''}`}
+                    </Button>
+                    <Button
+                        variant={activeTab === 'instructor_students' ? 'contained' : 'outlined'}
                         onClick={() => setActiveTab('instructor_students')}
                     >
                         Instructor Students by Major
-                    </button>
-                    <button
-                        className={`btn btn-outline-dark ${activeTab === 'students_by_major' ? 'active' : ''}`}
+                    </Button>
+                    <Button
+                        variant={activeTab === 'students_by_major' ? 'contained' : 'outlined'}
                         onClick={() => setActiveTab('students_by_major')}
                     >
                         Students by Major
-                    </button>
-                </div>
-            </div>
+                    </Button>
+                </ButtonGroup>
+            </Box>
 
-            {/* Row 3: Render Tables */}
-            <div className="row">
-                {activeTab === 'logs' && (
-                    <div className="col">
-                        <LogsTable />
-                    </div>
-                )}
-                {activeTab === 'gpa' && (
-                    <div className="col">
-                        <SystemAdminGPAStatisticsTable />
-                    </div>
-                )}
-                {activeTab === 'department_gpa' && (
-                    <div className="col">
-                        <DepartmentGPATable />
-                    </div>
-                )}
-                {activeTab === 'course_stats' && (
-                    <div className="col">
-                        <SystemAdminSemesterCourseStatsTable />
-                    </div>
-                )}
-                {activeTab === 'instructor_students' && (
-                    <div className="col">
-                        <InstructorStudentsByMajorTable />
-                    </div>
-                )}
-                {activeTab === 'students_by_major' && (
-                    <div className="col">
-                        <ListStudentsByMajorTable />
-                    </div>
-                )}
-            </div>
-        </div>
+            {/* Content Section */}
+            <Paper elevation={3} style={{ padding: '2rem' }}>
+                {activeTab === 'logs' && <LogsTable />}
+                {activeTab === 'gpa' && <SystemAdminGPAStatisticsTable />}
+                {activeTab === 'department_gpa' && <DepartmentGPATable />}
+                {activeTab === 'course_stats' && <SystemAdminSemesterCourseStatsTable />}
+                {activeTab === 'instructor_students' && <InstructorStudentsByMajorTable />}
+                {activeTab === 'students_by_major' && <ListStudentsByMajorTable />}
+            </Paper>
+        </Container>
     );
 };
 

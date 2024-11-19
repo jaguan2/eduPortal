@@ -1,6 +1,18 @@
+// export default InstructorStudentsByMajorTable;
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css";
+import {
+    Container,
+    Typography,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Alert,
+} from "@mui/material";
 
 const InstructorStudentsByMajorTable = () => {
     const [data, setData] = useState([]); // State to store fetched data
@@ -9,7 +21,9 @@ const InstructorStudentsByMajorTable = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get("http://127.0.0.1:5000/getSystemAdminInstructorStudentByMajor");
+                const response = await axios.get(
+                    "http://127.0.0.1:5000/getSystemAdminInstructorStudentByMajor"
+                );
                 setData(response.data); // Update the state with fetched data
             } catch (err) {
                 setError("Failed to fetch data.");
@@ -19,32 +33,45 @@ const InstructorStudentsByMajorTable = () => {
         fetchData(); // Fetch data when the component mounts
     }, []);
 
-    return (
-        <div className="container mt-5">
-            <h1 className="text-center mb-4">Instructor Students by Major</h1>
-            {error && <div className="alert alert-danger">{error}</div>}
+    // Function to format instructor ID
+    const formatInstructorId = (id) => {
+        return `U33${id.toString().padStart(6, "0")}`;
+    };
 
-            <table className="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th scope="col">Instructor ID</th>
-                        <th scope="col">Instructor Name</th>
-                        <th scope="col">Major</th>
-                        <th scope="col">Total Students</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map((item, index) => (
-                        <tr key={index}>
-                            <td>{item.instructor_id}</td>
-                            <td>{item.instructor_name}</td>
-                            <td>{item.major_name}</td>
-                            <td>{item.total_students}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+    return (
+        <Container style={{ marginTop: "2rem" }}>
+            <Typography variant="h4" align="center" gutterBottom>
+                Instructor Students by Major
+            </Typography>
+            {error && (
+                <Alert severity="error" style={{ marginBottom: "1rem" }}>
+                    {error}
+                </Alert>
+            )}
+
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Instructor ID</strong></TableCell>
+                            <TableCell><strong>Instructor Name</strong></TableCell>
+                            <TableCell><strong>Major</strong></TableCell>
+                            <TableCell><strong>Total Students</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {data.map((item, index) => (
+                            <TableRow key={index}>
+                                <TableCell>{formatInstructorId(item.instructor_id)}</TableCell>
+                                <TableCell>{item.instructor_name}</TableCell>
+                                <TableCell>{item.major_name}</TableCell>
+                                <TableCell>{item.total_students}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Container>
     );
 };
 

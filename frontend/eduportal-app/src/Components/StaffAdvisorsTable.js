@@ -1,50 +1,88 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Typography,
+    Box,
+    Button,
+    Alert,
+} from '@mui/material';
 
 const StaffAdvisorsTable = () => {
-    const [advisors, setAdvisors] = useState([]);
-    const [error, setError] = useState('');
+    const [advisors, setAdvisors] = useState([]); // State to store advisor data
+    const [error, setError] = useState(''); // State for error handling
+    const [showPasswords, setShowPasswords] = useState(false); // Toggle passwords visibility
 
     useEffect(() => {
         const fetchAdvisors = async () => {
             try {
+                // Fetch data from backend
                 const response = await axios.get('http://127.0.0.1:5000/getStaffAdvisors');
-                setAdvisors(response.data);
-            } catch (error) {
-                if (error.response) {
-                    setError(error.response.data.error);
-                } else {
-                    setError('Failed to fetch advisors. Please try again.');
-                }
+                // Pad advisor IDs
+                const paddedAdvisors = response.data.map((advisor) => ({
+                    ...advisor,
+                    id: `U22${advisor.id.toString().padStart(6, '0')}`,
+                }));
+                setAdvisors(paddedAdvisors); // Set padded data
+            } catch (err) {
+                setError('Failed to fetch advisors.');
             }
         };
 
-        fetchAdvisors();
+        fetchAdvisors(); // Trigger fetch when component mounts
     }, []);
 
     return (
-        <div className="container mt-5">
-            <h2 className="text-center">Advisors</h2>
-            {error && <div className="alert alert-danger">{error}</div>}
-            <table className="table table-striped table-bordered mt-3">
-                <thead>
-                    <tr>
-                        <th scope="col">Advisor ID</th>
-                        <th scope="col">Username</th>
-                        <th scope="col">Department</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {advisors.map((advisor) => (
-                        <tr key={advisor.id}>
-                            <td>{advisor.id}</td>
-                            <td>{advisor.username}</td>
-                            <td>{advisor.department}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+        <Box marginTop={3}>
+            {/* Header */}
+            <Typography variant="h5" align="center" gutterBottom>
+                Advisors in Your Department
+            </Typography>
+
+            {/* Error Alert */}
+            {error && <Alert severity="error" style={{ marginBottom: '1rem' }}>{error}</Alert>}
+
+            {/* Toggle Button */}
+            <Box textAlign="end" marginBottom={2}>
+                <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setShowPasswords((prev) => !prev)}
+                >
+                    {showPasswords ? 'Hide Passwords' : 'Show Passwords'}
+                </Button>
+            </Box>
+
+            {/* Table */}
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Advisor ID</strong></TableCell>
+                            <TableCell><strong>Username</strong></TableCell>
+                            <TableCell><strong>Password</strong></TableCell>
+                            <TableCell><strong>Department ID</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {advisors.map((advisor) => (
+                            <TableRow key={advisor.id}>
+                                <TableCell>{advisor.id}</TableCell>
+                                <TableCell>{advisor.username}</TableCell>
+                                <TableCell>{showPasswords ? advisor.password : '******'}</TableCell>
+                                <TableCell>{advisor.department}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
     );
 };
 

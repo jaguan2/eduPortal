@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css";
+import {
+    Container,
+    Typography,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Alert,
+    CircularProgress,
+} from "@mui/material";
 
 const ListStudentsByMajorTable = () => {
     const [studentsByMajor, setStudentsByMajor] = useState([]);
@@ -9,7 +21,9 @@ const ListStudentsByMajorTable = () => {
     useEffect(() => {
         const fetchStudentsByMajor = async () => {
             try {
-                const response = await axios.get("http://127.0.0.1:5000/getListStudentsByMajor");
+                const response = await axios.get(
+                    "http://127.0.0.1:5000/getListStudentsByMajor"
+                );
                 setStudentsByMajor(response.data);
             } catch (err) {
                 setError("Failed to fetch students by major.");
@@ -19,38 +33,58 @@ const ListStudentsByMajorTable = () => {
         fetchStudentsByMajor();
     }, []);
 
+    // Function to format Student ID
+    const formatStudentId = (id) => {
+        return `U11${id.toString().padStart(6, "0")}`;
+    };
+
     if (error) {
-        return <div className="container mt-5 alert alert-danger">{error}</div>;
+        return (
+            <Container style={{ marginTop: "2rem" }}>
+                <Alert severity="error">{error}</Alert>
+            </Container>
+        );
     }
 
     if (!studentsByMajor.length) {
-        return <div className="container mt-5 text-center">Loading...</div>; // Handle loading state
+        return (
+            <Container style={{ marginTop: "2rem", textAlign: "center" }}>
+                <CircularProgress />
+                <Typography variant="body1" style={{ marginTop: "1rem" }}>
+                    Loading...
+                </Typography>
+            </Container>
+        );
     }
 
     return (
-        <div className="container mt-5">
-            <h1 className="text-center mb-4">Students by Major</h1>
-            <table className="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th scope="col">Major</th>
-                        <th scope="col">Student ID</th>
-                        <th scope="col">Student Name</th>
-                        <th scope="col">Total Credits</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {studentsByMajor.map((student, index) => (
-                        <tr key={index}>
-                            <td>{student.major_name}</td>
-                            <td>{student.student_id}</td>
-                            <td>{student.student_name}</td>
-                            <td>{student.total_credits}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+        <Container style={{ marginTop: "2rem" }}>
+            <Typography variant="h4" align="center" gutterBottom>
+                Students by Major
+            </Typography>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Major</strong></TableCell>
+                            <TableCell><strong>Student ID</strong></TableCell>
+                            <TableCell><strong>Student Name</strong></TableCell>
+                            <TableCell><strong>Total Credits</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {studentsByMajor.map((student, index) => (
+                            <TableRow key={index}>
+                                <TableCell>{student.major_name}</TableCell>
+                                <TableCell>{formatStudentId(student.student_id)}</TableCell>
+                                <TableCell>{student.student_name}</TableCell>
+                                <TableCell>{student.total_credits}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Container>
     );
 };
 

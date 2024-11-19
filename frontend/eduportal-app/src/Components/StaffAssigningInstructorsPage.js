@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './StaffAssigningInstructorsPage.css';
+import {
+    Container,
+    Typography,
+    Paper,
+    TextField,
+    Button,
+    Alert,
+    Box,
+    Grid,
+    CircularProgress,
+} from '@mui/material';
+import StaffCoursesTable from './StaffCoursesTable'; // Import courses table
+import StaffInstructorsTable from './StaffInstructorsTable'; // Import instructors table
 
 const AssignInstructorsPage = () => {
     const [courses, setCourses] = useState([]);
@@ -21,12 +33,20 @@ const AssignInstructorsPage = () => {
                 const instructorsResponse = await axios.get('http://127.0.0.1:5000/getStaffInstructors', {
                     params: { department_id: 1 },
                 });
+
+                // Update instructors with padded IDs
+                const updatedInstructors = instructorsResponse.data.map((instructor) => ({
+                    ...instructor,
+                    instructor_id: `U33${instructor.instructor_id.toString().padStart(6, '0')}`,
+                }));
+
                 setCourses(coursesResponse.data);
-                setInstructors(instructorsResponse.data);
+                setInstructors(updatedInstructors);
             } catch (error) {
                 setError('Failed to fetch data.');
             }
         };
+
         fetchData();
     }, []);
 
@@ -41,7 +61,7 @@ const AssignInstructorsPage = () => {
         try {
             const response = await axios.post('http://127.0.0.1:5000/assign_instructors', {
                 course_id: courseId,
-                instructor_id: instructorId,
+                instructor_id: instructorId.replace('U33', ''), // Remove padding before sending
                 department_id: 1, // Replace with dynamic department ID
                 user_id: 1,       // Replace with dynamic user ID
                 username: 'staff_user',
@@ -57,102 +77,67 @@ const AssignInstructorsPage = () => {
     };
 
     return (
-        <div className="container mt-5">
-            <h1 className="text-center mb-4">Assign Instructors</h1>
-            {error && <div className="alert alert-danger">{error}</div>}
-            {success && <div className="alert alert-success">{success}</div>}
+        <Container style={{ marginTop: '2rem' }}>
+            {/* Header */}
+            <Typography variant="h4" align="center" gutterBottom>
+                Assign Instructors
+            </Typography>
+
+            {/* Error and Success Alerts */}
+            {error && <Alert severity="error" style={{ marginBottom: '1rem' }}>{error}</Alert>}
+            {success && <Alert severity="success" style={{ marginBottom: '1rem' }}>{success}</Alert>}
 
             {/* Form Section */}
-            <div className="card p-4 mt-4">
-                <h2>Assign Instructor</h2>
-                <div className="form-group mb-3">
-                    <label htmlFor="courseId">Course ID</label>
-                    <input
-                        type="text"
-                        id="courseId"
-                        className="form-control"
-                        placeholder="Enter course ID"
-                        value={courseId}
-                        onChange={(e) => setCourseId(e.target.value)}
-                    />
-                </div>
-                <div className="form-group mb-3">
-                    <label htmlFor="instructorId">Instructor ID</label>
-                    <input
-                        type="text"
-                        id="instructorId"
-                        className="form-control"
-                        placeholder="Enter instructor ID"
-                        value={instructorId}
-                        onChange={(e) => setInstructorId(e.target.value)}
-                    />
-                </div>
-                <button className="btn btn-primary w-100" onClick={handleAssignInstructor} disabled={loading}>
-                    {loading ? 'Assigning...' : 'Assign Instructor'}
-                </button>
-            </div>
+            <Paper style={{ padding: '2rem', marginBottom: '2rem' }}>
+                <Typography variant="h6" gutterBottom>
+                    Assign Instructor
+                </Typography>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="Course ID"
+                            placeholder="Enter course ID"
+                            value={courseId}
+                            onChange={(e) => setCourseId(e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="Instructor ID"
+                            placeholder="Enter instructor ID"
+                            value={instructorId}
+                            onChange={(e) => setInstructorId(e.target.value)}
+                        />
+                    </Grid>
+                </Grid>
+                <Box marginTop={2}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        onClick={handleAssignInstructor}
+                        disabled={loading}
+                    >
+                        {loading ? <CircularProgress size={24} /> : 'Assign Instructor'}
+                    </Button>
+                </Box>
+            </Paper>
 
             {/* Tables Section */}
-            <div className="row">
+            <Grid container spacing={3}>
                 {/* Courses Table */}
-                <div className="col-md-12">
-                    <h2 className="text-center">Courses</h2>
-                    <table className="table table-striped table-bordered mt-3">
-                        <thead>
-                            <tr>
-                                <th scope="col">Course ID</th>
-                                <th scope="col">Prefix</th>
-                                <th scope="col">Number</th>
-                                <th scope="col">Course Name</th>
-                                <th scope="col">Credits</th>
-                                <th scope="col">Semester</th>
-                                <th scope="col">Year</th>
-                                <th scope="col">Class Time</th>
-                                <th scope="col">Class Day</th>
-                                <th scope="col">Instructor ID</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {courses.map((course) => (
-                                <tr key={course.id}>
-                                    <td>{course.id}</td>
-                                    <td>{course.prefix}</td>
-                                    <td>{course.number}</td>
-                                    <td>{course.courseName}</td>
-                                    <td>{course.credits}</td>
-                                    <td>{course.semester}</td>
-                                    <td>{course.year}</td>
-                                    <td>{course.classTime}</td>
-                                    <td>{course.classDay}</td>
-                                    <td>{course.instructor}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                <Grid item xs={12}>
+                    <StaffCoursesTable courses={courses} />
+                </Grid>
 
                 {/* Instructors Table */}
-                <div className="col-md-6">
-                    <h2>Instructors</h2>
-                    <table className="table table-bordered mt-3">
-                        <thead className="thead-light">
-                            <tr>
-                                <th>Instructor ID</th>
-                                <th>Username</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {instructors.map((instructor) => (
-                                <tr key={instructor.instructor_id}>
-                                    <td>{instructor.instructor_id}</td>
-                                    <td>{instructor.username}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+                <Grid item xs={12} sm={6}>
+                    <StaffInstructorsTable instructors={instructors} />
+                </Grid>
+            </Grid>
+        </Container>
     );
 };
 

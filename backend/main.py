@@ -328,475 +328,6 @@ def view_logs():
     logs_json = logs_df.to_dict(orient="records")
     return jsonify(logs_json), 200
 
-# STAFF FLASK ROUTES
-
-# Hardcoded staff user and department ID
-STAFF_USER_ID = 1
-StaffDepartment_ID = 1
-
-# Database connection helper
-def get_db_connection():
-    conn = sqlite3.connect('eduPortalDB.db')
-    conn.row_factory = sqlite3.Row  # Allows fetching rows as dictionaries
-    return conn
-
-@app.route("/getStaffID", methods=['GET'])
-def getStaffID():
-    """Fetch hardcoded staff ID."""
-    return jsonify({"uid": STAFF_USER_ID})
-
-@app.route("/getStaffDepartment", methods=['GET'])
-def getStaffDepartment():
-    """Fetch the department name of the hardcoded staff user."""
-    conn = get_db_connection()
-    query = '''
-        SELECT department.id AS department_id, department.departmentName AS department_name
-        FROM staff
-        JOIN department ON staff.department = department.id
-        WHERE staff.id = ?;
-    '''
-    try:
-        user_df = pd.read_sql_query(query, conn, params=(STAFF_USER_ID,))
-        if not user_df.empty:
-            # Modify the response to include 'department' as a key
-            return jsonify({
-                "department_id": int(user_df.iloc[0]['department_id']),
-                "department": user_df.iloc[0]['department_name']  # Add this key
-            }), 200
-        else:
-            return jsonify({"error": "Department not found"}), 404
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        conn.close()
-
-@app.route("/getStaffInstructors", methods=['GET'])
-def getStaffInstructors():
-    """Fetch all instructors under the same department as the hardcoded staff user."""
-    conn = get_db_connection()
-    query = '''
-        SELECT id AS instructor_id, username
-        FROM instructors
-        WHERE department = ?;
-    '''
-    try:
-        instructors = conn.execute(query, (StaffDepartment_ID,)).fetchall()
-        return jsonify([dict(instructor) for instructor in instructors]), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        conn.close()
-
-@app.route("/getStaffManageInstructors", methods=['GET'])
-def getStaffManageInstructors():
-    """Fetch all instructors under the same department as the hardcoded staff user, including their password."""
-    conn = get_db_connection()
-    query = '''
-        SELECT id AS instructor_id, username, password
-        FROM instructors
-        WHERE department = ?;
-    '''
-    try:
-        instructors = conn.execute(query, (StaffDepartment_ID,)).fetchall()
-        return jsonify([dict(instructor) for instructor in instructors]), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        conn.close()
-
-
-@app.route("/getStaffCourses", methods=['GET'])
-def getStaffCourses():
-    """Fetch all courses under the same department as the hardcoded staff user."""
-    conn = get_db_connection()
-    query = '''
-        SELECT id, prefix, number, courseName, credits, semester, year, classTime, classDay, instructor
-        FROM courses
-        WHERE department = ?;
-    '''
-    try:
-        courses = conn.execute(query, (StaffDepartment_ID,)).fetchall()
-        return jsonify([dict(course) for course in courses]), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        conn.close()
-
-@app.route("/manage_courses", methods=['POST'])
-def manage_courses():
-    """Manage course operations: add, update, or delete."""
-    data = request.json
-    action = data.get('action')  # 'add', 'update', 'delete'
-    course_id = data.get('id')
-    course_name = data.get('courseName')
-    prefix = data.get('prefix')
-    number = data.get('number')
-    credits = data.get('credits')
-    semester = data.get('semester')
-    year = data.get('year')
-    class_time = data.get('classTime')
-    class_day = data.get('classDay')
-    instructor_id = data.get('instructor')
-    department_id = StaffDepartment_ID  # Hardcoded department
-    conn = get_db_connection()
-
-    try:
-        # ADD Course
-        if action == 'add':
-            # Check if course ID already exists
-            existing_course = conn.execute('SELECT * FROM courses WHERE id = ?', (course_id,)).fetchone()
-            if existing_course:
-                return jsonify({'error': 'Course ID already exists'}), 400
-
-            # Check for instructor conflicts (if instructor is provided)
-            if instructor_id and class_time and class_day:
-                conflicts = conn.execute(
-                    '''
-                    SELECT * FROM courses 
-                    WHERE instructor = ? AND classTime = ? AND classDay = ? AND semester = ? AND year = ?
-                    ''', (instructor_id, class_time, class_day, semester, year)
-                ).fetchall()
-                if conflicts:
-                    return jsonify({'error': 'Instructor has a scheduling conflict'}), 400
-
-            # Insert new course
-            conn.execute(
-                '''
-                INSERT INTO courses (id, prefix, number, courseName, credits, semester, year, classTime, classDay, instructor, department)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (course_id, prefix, number, course_name, credits, semester, year, class_time, class_day, instructor_id, department_id)
-            )
-            conn.commit()
-            return jsonify({'message': 'Course added successfully'}), 200
-
-        # UPDATE Course
-        elif action == 'update':
-            # Check if the course exists
-            existing_course = conn.execute('SELECT * FROM courses WHERE id = ?', (course_id,)).fetchone()
-            if not existing_course:
-                return jsonify({'error': 'Course not found'}), 404
-
-            # Check for instructor conflicts (if instructor is updated)
-            if instructor_id and class_time and class_day:
-                conflicts = conn.execute(
-                    '''
-                    SELECT * FROM courses 
-                    WHERE instructor = ? AND classTime = ? AND classDay = ? AND semester = ? AND year = ? AND id != ?
-                    ''', (instructor_id, class_time, class_day, semester, year, course_id)
-                ).fetchall()
-                if conflicts:
-                    return jsonify({'error': 'Instructor has a scheduling conflict'}), 400
-
-            # Update course
-            conn.execute(
-                '''
-                UPDATE courses
-                SET prefix = ?, number = ?, courseName = ?, credits = ?, semester = ?, year = ?, classTime = ?, classDay = ?, instructor = ?
-                WHERE id = ?
-                ''', (prefix, number, course_name, credits, semester, year, class_time, class_day, instructor_id, course_id)
-            )
-            conn.commit()
-            return jsonify({'message': 'Course updated successfully'}), 200
-
-        # DELETE Course
-        elif action == 'delete':
-            # Check if the course exists
-            existing_course = conn.execute('SELECT * FROM courses WHERE id = ?', (course_id,)).fetchone()
-            if not existing_course:
-                return jsonify({'error': 'Course not found'}), 404
-
-            # Delete course
-            conn.execute('DELETE FROM courses WHERE id = ?', (course_id,))
-            conn.commit()
-            return jsonify({'message': 'Course deleted successfully'}), 200
-
-        else:
-            return jsonify({'error': 'Invalid action'}), 400
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    finally:
-        conn.close()
-
-@app.route("/assign_instructors", methods=['POST'])
-def assign_instructors():
-    """Assign instructors to a course."""
-    data = request.json
-    course_id = data.get('course_id')
-    instructor_id = data.get('instructor_id')
-    user_id = STAFF_USER_ID  # Hardcoded staff ID
-    username = data.get('username', 'staff_user')
-
-    conn = get_db_connection()
-    try:
-        instructor = conn.execute('SELECT * FROM instructors WHERE id = ? AND department = ?',
-                                  (instructor_id, StaffDepartment_ID)).fetchone()
-        if not instructor:
-            return jsonify({'error': 'Instructor does not belong to the same department'}), 403
-
-        conn.execute('UPDATE courses SET instructor = ? WHERE id = ?', (instructor_id, course_id))
-        log_operation(user_id, username, 'UPDATE', 'courses', f'Assigned instructor {instructor_id} to course {course_id}')
-        conn.commit()
-        return jsonify({'message': 'Instructor assigned successfully'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    finally:
-        conn.close()
-
-# Validates if staff member is allowed to perform actions tied to a specific department
-@app.route('/staff_in_department', methods=['GET'])
-def staff_in_department():
-    # user_id = request.args.get('user_id')
-    # department_id = request.args.get('department_id')
-    user_id = 1  # Hardcoded for testing
-    department_id = 1
-
-    conn = get_db_connection()
-    staff_user = conn.execute(
-        'SELECT * FROM staff WHERE id = ? AND department = ?',
-        (user_id, department_id)
-    ).fetchone()
-    conn.close()
-    if staff_user:
-        return jsonify({'message': 'Staff belongs to the department'}), 200
-    else:
-        return jsonify({'error': 'Staff does not belong to the department'}), 403
-
-@app.route("/getStaffName", methods=["GET"])
-def getStaffName():
-    current_user = "1"  # Hardcoded for testing
-    role = "staff"
-
-    conn = sqlite3.connect('eduPortalDB.db')
-
-    try:
-        query = f"SELECT username FROM {role} WHERE id = ?;"
-        user_df = pd.read_sql(query, conn, params=(current_user,))
-        
-        if not user_df.empty:
-            username = user_df.iloc[0]['username']
-            return jsonify({"username": username}), 200
-        else:
-            return jsonify({"error": "User not found"}), 404
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        conn.close()
-
-@app.route("/manage_instructors", methods=['POST'])
-def manage_instructors():
-    """Manage instructor operations: add, update, or delete."""
-    data = request.json
-    action = data.get('action')  # 'add', 'update', 'delete'
-    instructor_id = data.get('id')
-    username = data.get('username')
-    password = data.get('password')
-    department_id = 1  # Hardcoded department ID
-
-    conn = get_db_connection()
-    try:
-        if action == 'add':
-            conn.execute('INSERT INTO instructors (username, password, department) VALUES (?, ?, ?)',
-                         (username, password, department_id))
-        elif action == 'update':
-            conn.execute('UPDATE instructors SET username = ?, password = ?, department = ? WHERE id = ?',
-                         (username, password, department_id, instructor_id))
-        elif action == 'delete':
-            conn.execute('DELETE FROM instructors WHERE id = ?', (instructor_id,))
-        else:
-            return jsonify({'error': 'Invalid action'}), 400
-        conn.commit()
-        return jsonify({'message': 'Operation successful'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    finally:
-        conn.close()
-
-@app.route("/getStaffMajors", methods=["GET"])
-def getStaffMajors():
-    """Fetch all majors for the staff's department."""
-    # Example: Hardcoded staff department for testing
-    staff_department_id = 1  # Replace this with dynamic retrieval later
-
-    conn = get_db_connection()
-    try:
-        # Query to fetch majors belonging to the staff's department
-        query = """
-        SELECT id, majorName
-        FROM major
-        WHERE department = ?
-        """
-        cursor = conn.execute(query, (staff_department_id,))
-        results = cursor.fetchall()
-
-        # If no majors are found, return a friendly error
-        if not results:
-            return jsonify({"error": "No majors found for this department"}), 404
-
-        # Format the results into a list of dictionaries
-        majors = [{"id": row[0], "majorName": row[1]} for row in results]
-        return jsonify({"majors": majors}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        conn.close()
-
-@app.route("/manage_students", methods=['POST'])
-def manage_students():
-    """Manage student operations: add, update, or delete."""
-    data = request.json
-    action = data.get('action')  # 'add', 'update', 'delete'
-    student_id = data.get('id')
-    username = data.get('username')
-    password = data.get('password')
-    major_id = data.get('major')  # Include major
-
-    conn = get_db_connection()
-
-    try:
-        if action == 'add':
-            # Add a new student
-            conn.execute(
-                '''
-                INSERT INTO students (username, password, major)
-                VALUES (?, ?, ?)
-                ''',
-                (username, password, major_id)
-            )
-            conn.commit()
-            return jsonify({'message': 'Student added successfully'}), 200
-
-        elif action == 'update':
-            # Update an existing student
-            conn.execute(
-                '''
-                UPDATE students
-                SET username = ?, password = ?, major = ?
-                WHERE id = ?
-                ''',
-                (username, password, major_id, student_id)
-            )
-            conn.commit()
-            return jsonify({'message': 'Student updated successfully'}), 200
-
-        elif action == 'delete':
-            # Ensure student is not the only one in their major before deletion
-            major_students = conn.execute(
-                'SELECT COUNT(*) FROM students WHERE major = ?', (major_id,)
-            ).fetchone()[0]
-            if major_students <= 1:
-                return jsonify({'error': 'Cannot delete the only student in this major'}), 400
-
-            conn.execute('DELETE FROM students WHERE id = ?', (student_id,))
-            conn.commit()
-            return jsonify({'message': 'Student deleted successfully'}), 200
-
-        else:
-            return jsonify({'error': 'Invalid action'}), 400
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    finally:
-        conn.close()
-
-@app.route("/getStaffStudents", methods=["GET"])
-def getStaffStudents():
-    """Fetch all students from the same department as the staff."""
-    # Simulated staff ID and department for testing (replace with actual session/user management later)
-    staff_id = 1  # Hardcoded for testing
-    conn = get_db_connection()
-
-    try:
-        # Fetch the department ID of the staff member
-        staff_department_query = "SELECT department FROM staff WHERE id = ?"
-        staff_department = conn.execute(staff_department_query, (staff_id,)).fetchone()
-
-        if not staff_department:
-            return jsonify({"error": "Staff not found"}), 404
-
-        # Fetch students from the same department
-        department_id = staff_department[0]
-        query = """
-        SELECT 
-            students.id, 
-            students.username, 
-            students.password, 
-            major.majorName 
-        FROM 
-            students
-        JOIN 
-            major ON students.major = major.id
-        WHERE 
-            major.department = ?
-        """
-        students = conn.execute(query, (department_id,)).fetchall()
-
-        # Convert results to JSON format
-        results = [
-            {
-                "id": row[0],
-                "username": row[1],
-                "password": row[2],
-                "major": row[3]
-            }
-            for row in students
-        ]
-        return jsonify({"students": results}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        conn.close()
-
-
-
-@app.route("/manage_advisors", methods=['POST'])
-def manage_advisors():
-    """Manage advisor operations: add, update, or delete."""
-    data = request.json
-    action = data.get('action')  # 'add', 'update', 'delete'
-    advisor_id = data.get('id')
-    username = data.get('username')
-    password = data.get('password')
-    department_id = 1  # Hardcoded department ID
-
-    conn = get_db_connection()
-    try:
-        if action == 'add':
-            conn.execute('INSERT INTO advisors (username, password, department) VALUES (?, ?, ?)',
-                         (username, password, department_id))
-        elif action == 'update':
-            conn.execute('UPDATE advisors SET username = ?, password = ?, department = ? WHERE id = ?',
-                         (username, password, department_id, advisor_id))
-        elif action == 'delete':
-            conn.execute('DELETE FROM advisors WHERE id = ?', (advisor_id,))
-        else:
-            return jsonify({'error': 'Invalid action'}), 400
-        conn.commit()
-        return jsonify({'message': 'Operation successful'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    finally:
-        conn.close()
-
-@app.route("/getStaffAdvisors", methods=['GET'])
-def get_staff_advisors():
-    """Fetch all advisors for the hardcoded department."""
-    department_id = 1  # Hardcoded department ID
-    conn = get_db_connection()
-    try:
-        query = '''
-            SELECT id, username, department
-            FROM advisors
-            WHERE department = ?;
-        '''
-        advisors = conn.execute(query, (department_id,)).fetchall()
-        advisors_list = [dict(row) for row in advisors]
-        return jsonify(advisors_list), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    finally:
-        conn.close()
-
 @app.route("/admin_gpa_statistics", methods=["GET"])
 def admin_gpa_statistics():
     """Fetch highest, lowest, and average GPA for each major."""
@@ -1288,6 +819,526 @@ def admin_department_gpa_rankings():
         return jsonify(data), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+# Hardcoded staff user and department ID
+STAFF_USER_ID = 1
+StaffDepartment_ID = 1
+
+# Database connection helper
+def get_db_connection():
+    conn = sqlite3.connect('eduPortalDB.db')
+    conn.row_factory = sqlite3.Row  # Allows fetching rows as dictionaries
+    return conn
+
+@app.route("/getStaffID", methods=['GET'])
+def getStaffID():
+    """Fetch hardcoded staff ID."""
+    return jsonify({"uid": STAFF_USER_ID})
+
+@app.route("/getStaffDepartment", methods=['GET'])
+def getStaffDepartment():
+    """Fetch the department name of the hardcoded staff user."""
+    conn = get_db_connection()
+    query = '''
+        SELECT department.id AS department_id, department.departmentName AS department_name
+        FROM staff
+        JOIN department ON staff.department = department.id
+        WHERE staff.id = ?;
+    '''
+    try:
+        user_df = pd.read_sql_query(query, conn, params=(STAFF_USER_ID,))
+        if not user_df.empty:
+            # Modify the response to include 'department' as a key
+            return jsonify({
+                "department_id": int(user_df.iloc[0]['department_id']),
+                "department": user_df.iloc[0]['department_name']  # Add this key
+            }), 200
+        else:
+            return jsonify({"error": "Department not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/getStaffInstructors", methods=['GET'])
+def getStaffInstructors():
+    """Fetch all instructors under the same department as the hardcoded staff user."""
+    conn = get_db_connection()
+    query = '''
+        SELECT id AS instructor_id, username
+        FROM instructors
+        WHERE department = ?;
+    '''
+    try:
+        instructors = conn.execute(query, (StaffDepartment_ID,)).fetchall()
+        return jsonify([dict(instructor) for instructor in instructors]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/getStaffManageInstructors", methods=['GET'])
+def getStaffManageInstructors():
+    """Fetch all instructors under the same department as the hardcoded staff user, including their password."""
+    conn = get_db_connection()
+    query = '''
+        SELECT id AS instructor_id, username, password
+        FROM instructors
+        WHERE department = ?;
+    '''
+    try:
+        instructors = conn.execute(query, (StaffDepartment_ID,)).fetchall()
+        return jsonify([dict(instructor) for instructor in instructors]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+
+@app.route("/getStaffCourses", methods=['GET'])
+def getStaffCourses():
+    """Fetch all courses under the same department as the hardcoded staff user."""
+    conn = get_db_connection()
+    query = '''
+        SELECT id, prefix, number, courseName, credits, semester, year, classTime, classDay, instructor
+        FROM courses
+        WHERE department = ?;
+    '''
+    try:
+        courses = conn.execute(query, (StaffDepartment_ID,)).fetchall()
+        return jsonify([dict(course) for course in courses]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/manage_courses", methods=['POST'])
+def manage_courses():
+    """Manage course operations: add, update, or delete."""
+    data = request.json
+    action = data.get('action')  # 'add', 'update', 'delete'
+    course_id = data.get('id')
+    course_name = data.get('courseName')
+    prefix = data.get('prefix')
+    number = data.get('number')
+    credits = data.get('credits')
+    semester = data.get('semester')
+    year = data.get('year')
+    class_time = data.get('classTime')
+    class_day = data.get('classDay')
+    instructor_id = data.get('instructor')
+    department_id = StaffDepartment_ID  # Hardcoded department
+    conn = get_db_connection()
+
+    try:
+        # ADD Course
+        if action == 'add':
+            # Check if course ID already exists
+            existing_course = conn.execute('SELECT * FROM courses WHERE id = ?', (course_id,)).fetchone()
+            if existing_course:
+                return jsonify({'error': 'Course ID already exists'}), 400
+
+            # Check for instructor conflicts (if instructor is provided)
+            if instructor_id and class_time and class_day:
+                conflicts = conn.execute(
+                    '''
+                    SELECT * FROM courses 
+                    WHERE instructor = ? AND classTime = ? AND classDay = ? AND semester = ? AND year = ?
+                    ''', (instructor_id, class_time, class_day, semester, year)
+                ).fetchall()
+                if conflicts:
+                    return jsonify({'error': 'Instructor has a scheduling conflict'}), 400
+
+            # Insert new course
+            conn.execute(
+                '''
+                INSERT INTO courses (id, prefix, number, courseName, credits, semester, year, classTime, classDay, instructor, department)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (course_id, prefix, number, course_name, credits, semester, year, class_time, class_day, instructor_id, department_id)
+            )
+            conn.commit()
+            return jsonify({'message': 'Course added successfully'}), 200
+
+        # UPDATE Course
+        elif action == 'update':
+            # Check if the course exists
+            existing_course = conn.execute('SELECT * FROM courses WHERE id = ?', (course_id,)).fetchone()
+            if not existing_course:
+                return jsonify({'error': 'Course not found'}), 404
+
+            # Check for instructor conflicts (if instructor is updated)
+            if instructor_id and class_time and class_day:
+                conflicts = conn.execute(
+                    '''
+                    SELECT * FROM courses 
+                    WHERE instructor = ? AND classTime = ? AND classDay = ? AND semester = ? AND year = ? AND id != ?
+                    ''', (instructor_id, class_time, class_day, semester, year, course_id)
+                ).fetchall()
+                if conflicts:
+                    return jsonify({'error': 'Instructor has a scheduling conflict'}), 400
+
+            # Update course
+            conn.execute(
+                '''
+                UPDATE courses
+                SET prefix = ?, number = ?, courseName = ?, credits = ?, semester = ?, year = ?, classTime = ?, classDay = ?, instructor = ?
+                WHERE id = ?
+                ''', (prefix, number, course_name, credits, semester, year, class_time, class_day, instructor_id, course_id)
+            )
+            conn.commit()
+            return jsonify({'message': 'Course updated successfully'}), 200
+
+        # DELETE Course
+        elif action == 'delete':
+            # Check if the course exists
+            existing_course = conn.execute('SELECT * FROM courses WHERE id = ?', (course_id,)).fetchone()
+            if not existing_course:
+                return jsonify({'error': 'Course not found'}), 404
+
+            # Delete course
+            conn.execute('DELETE FROM courses WHERE id = ?', (course_id,))
+            conn.commit()
+            return jsonify({'message': 'Course deleted successfully'}), 200
+
+        else:
+            return jsonify({'error': 'Invalid action'}), 400
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/assign_instructors", methods=['POST'])
+def assign_instructors():
+    """Assign instructors to a course."""
+    data = request.json
+    course_id = data.get('course_id')
+    instructor_id = data.get('instructor_id')
+    user_id = STAFF_USER_ID  # Hardcoded staff ID
+    username = data.get('username', 'staff_user')
+
+    conn = get_db_connection()
+    try:
+        instructor = conn.execute('SELECT * FROM instructors WHERE id = ? AND department = ?',
+                                  (instructor_id, StaffDepartment_ID)).fetchone()
+        if not instructor:
+            return jsonify({'error': 'Instructor does not belong to the same department'}), 403
+
+        conn.execute('UPDATE courses SET instructor = ? WHERE id = ?', (instructor_id, course_id))
+        log_operation(user_id, username, 'UPDATE', 'courses', f'Assigned instructor {instructor_id} to course {course_id}')
+        conn.commit()
+        return jsonify({'message': 'Instructor assigned successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+# Validates if staff member is allowed to perform actions tied to a specific department
+@app.route('/staff_in_department', methods=['GET'])
+def staff_in_department():
+    # user_id = request.args.get('user_id')
+    # department_id = request.args.get('department_id')
+    user_id = 1  # Hardcoded for testing
+    department_id = 1
+
+    conn = get_db_connection()
+    staff_user = conn.execute(
+        'SELECT * FROM staff WHERE id = ? AND department = ?',
+        (user_id, department_id)
+    ).fetchone()
+    conn.close()
+    if staff_user:
+        return jsonify({'message': 'Staff belongs to the department'}), 200
+    else:
+        return jsonify({'error': 'Staff does not belong to the department'}), 403
+
+@app.route("/getStaffName", methods=["GET"])
+def getStaffName():
+    current_user = "1"  # Hardcoded for testing
+    role = "staff"
+
+    conn = sqlite3.connect('eduPortalDB.db')
+
+    try:
+        query = f"SELECT username FROM {role} WHERE id = ?;"
+        user_df = pd.read_sql(query, conn, params=(current_user,))
+        
+        if not user_df.empty:
+            username = user_df.iloc[0]['username']
+            return jsonify({"username": username}), 200
+        else:
+            return jsonify({"error": "User not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/manage_instructors", methods=['POST'])
+def manage_instructors():
+    """Manage instructor operations: add, update, or delete."""
+    data = request.json
+    action = data.get('action')  # 'add', 'update', 'delete'
+    instructor_id = data.get('id')
+    username = data.get('username')
+    password = data.get('password')
+    department_id = 1  # Hardcoded department ID
+
+    conn = get_db_connection()
+    try:
+        if action == 'add':
+            conn.execute('INSERT INTO instructors (username, password, department) VALUES (?, ?, ?)',
+                         (username, password, department_id))
+        elif action == 'update':
+            conn.execute('UPDATE instructors SET username = ?, password = ?, department = ? WHERE id = ?',
+                         (username, password, department_id, instructor_id))
+        elif action == 'delete':
+            conn.execute('DELETE FROM instructors WHERE id = ?', (instructor_id,))
+        else:
+            return jsonify({'error': 'Invalid action'}), 400
+        conn.commit()
+        return jsonify({'message': 'Operation successful'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/getStaffMajors", methods=["GET"])
+def getStaffMajors():
+    """Fetch all majors for the staff's department."""
+    # Example: Hardcoded staff department for testing
+    staff_department_id = 1  # Replace this with dynamic retrieval later
+
+    conn = get_db_connection()
+    try:
+        # Query to fetch majors belonging to the staff's department
+        query = """
+        SELECT id, majorName
+        FROM major
+        WHERE department = ?
+        """
+        cursor = conn.execute(query, (staff_department_id,))
+        results = cursor.fetchall()
+
+        # If no majors are found, return a friendly error
+        if not results:
+            return jsonify({"error": "No majors found for this department"}), 404
+
+        # Format the results into a list of dictionaries
+        majors = [{"id": row[0], "majorName": row[1]} for row in results]
+        return jsonify({"majors": majors}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/manage_students", methods=['POST'])
+def manage_students():
+    """Manage student operations: add, update, or delete."""
+    data = request.json
+    action = data.get('action')  # 'add', 'update', 'delete'
+    student_id = data.get('id')
+    username = data.get('username')
+    password = data.get('password')
+    major_id = data.get('major')  # Include major
+
+    conn = get_db_connection()
+
+    try:
+        if action == 'add':
+            # Add a new student
+            conn.execute(
+                '''
+                INSERT INTO students (username, password, major)
+                VALUES (?, ?, ?)
+                ''',
+                (username, password, major_id)
+            )
+            conn.commit()
+            return jsonify({'message': 'Student added successfully'}), 200
+
+        elif action == 'update':
+            # Update an existing student
+            conn.execute(
+                '''
+                UPDATE students
+                SET username = ?, password = ?, major = ?
+                WHERE id = ?
+                ''',
+                (username, password, major_id, student_id)
+            )
+            conn.commit()
+            return jsonify({'message': 'Student updated successfully'}), 200
+
+        elif action == 'delete':
+            # Ensure student is not the only one in their major before deletion
+            major_students = conn.execute(
+                'SELECT COUNT(*) FROM students WHERE major = ?', (major_id,)
+            ).fetchone()[0]
+            if major_students <= 1:
+                return jsonify({'error': 'Cannot delete the only student in this major'}), 400
+
+            conn.execute('DELETE FROM students WHERE id = ?', (student_id,))
+            conn.commit()
+            return jsonify({'message': 'Student deleted successfully'}), 200
+
+        else:
+            return jsonify({'error': 'Invalid action'}), 400
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/getStaffStudents", methods=["GET"])
+def getStaffStudents():
+    """Fetch all students from the same department as the staff."""
+    # Simulated staff ID and department for testing (replace with actual session/user management later)
+    staff_id = 1  # Hardcoded for testing
+    conn = get_db_connection()
+
+    try:
+        # Fetch the department ID of the staff member
+        staff_department_query = "SELECT department FROM staff WHERE id = ?"
+        staff_department = conn.execute(staff_department_query, (staff_id,)).fetchone()
+
+        if not staff_department:
+            return jsonify({"error": "Staff not found"}), 404
+
+        # Fetch students from the same department
+        department_id = staff_department[0]
+        query = """
+        SELECT 
+            students.id, 
+            students.username, 
+            students.password, 
+            major.majorName 
+        FROM 
+            students
+        JOIN 
+            major ON students.major = major.id
+        WHERE 
+            major.department = ?
+        """
+        students = conn.execute(query, (department_id,)).fetchall()
+
+        # Convert results to JSON format
+        results = [
+            {
+                "id": row[0],
+                "username": row[1],
+                "password": row[2],
+                "major": row[3]
+            }
+            for row in students
+        ]
+        return jsonify({"students": results}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/manage_advisors", methods=['POST'])
+def manage_advisors():
+    """Manage advisor operations: add, update, or delete."""
+    data = request.json
+    action = data.get('action')  # 'add', 'update', 'delete'
+    advisor_id = data.get('id')
+    username = data.get('username')
+    password = data.get('password')
+    department_id = 1  # Hardcoded department ID for now
+
+    # Validate required fields
+    if not action or (action != 'add' and not advisor_id):
+        return jsonify({'error': 'Action and Advisor ID are required for update/delete operations.'}), 400
+
+    if action in ['add', 'update'] and not all([username, password]):
+        return jsonify({'error': 'Username and Password are required for add/update operations.'}), 400
+
+    if action == 'add' and not department_id:
+        return jsonify({'error': 'Department is required for adding an advisor.'}), 400
+
+    # Ensure username and ID are not the same
+    if username == str(advisor_id):
+        return jsonify({'error': 'Username and ID cannot be the same. Please choose a unique username.'}), 400
+
+    conn = get_db_connection()
+    try:
+        if action == 'add':
+            # Ensure advisor does not already exist with the same username
+            existing_advisor = conn.execute(
+                'SELECT * FROM advisors WHERE username = ?',
+                (username,)
+            ).fetchone()
+            if existing_advisor:
+                return jsonify({'error': 'An advisor with this username already exists. Please use the update action.'}), 400
+
+            # Add the new advisor
+            conn.execute(
+                'INSERT INTO advisors (username, password, department) VALUES (?, ?, ?)',
+                (username, password, department_id)
+            )
+
+        elif action == 'update':
+            # Ensure the advisor exists
+            existing_advisor = conn.execute(
+                'SELECT * FROM advisors WHERE id = ?',
+                (advisor_id,)
+            ).fetchone()
+            if not existing_advisor:
+                return jsonify({'error': 'Advisor not found for update. Please use the add action to create a new advisor.'}), 404
+
+            # Update advisor
+            conn.execute(
+                '''
+                UPDATE advisors 
+                SET username = ?, password = ?, department = ? 
+                WHERE id = ?
+                ''',
+                (username, password, department_id, advisor_id)
+            )
+
+        elif action == 'delete':
+            # Ensure the advisor exists
+            existing_advisor = conn.execute(
+                'SELECT * FROM advisors WHERE id = ?',
+                (advisor_id,)
+            ).fetchone()
+            if not existing_advisor:
+                return jsonify({'error': 'Advisor not found for deletion.'}), 404
+
+            # Delete advisor
+            conn.execute('DELETE FROM advisors WHERE id = ?', (advisor_id,))
+
+        else:
+            return jsonify({'error': 'Invalid action specified.'}), 400
+
+        conn.commit()
+        return jsonify({'message': 'Operation successful'}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        conn.close()
+
+@app.route("/getStaffAdvisors", methods=['GET'])
+def get_staff_advisors():
+    """Fetch all advisors for the hardcoded department."""
+    department_id = 1  # Hardcoded department ID
+    conn = get_db_connection()
+    try:
+        query = '''
+            SELECT id, username, password, department
+            FROM advisors
+            WHERE department = ?;
+        '''
+        advisors = conn.execute(query, (department_id,)).fetchall()
+        advisors_list = [dict(row) for row in advisors]
+        return jsonify(advisors_list), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
     finally:
         conn.close()
 
