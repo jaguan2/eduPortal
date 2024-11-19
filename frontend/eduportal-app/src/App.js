@@ -9,8 +9,8 @@ import WhatIfPage from './Routes/WhatIfPage';
 import InstructorDashboard from './Routes/InstructorDashboard';
 import SystemAdminDashboard from './Routes/SystemAdminDashboard';
 import StaffDashboard from './Routes/StaffDashboard';
-import ManageCoursesPage from './Components/StaffManagingCoursesPage';
-import AssignInstructorsPage from './Components/StaffAssigningInstructorsPage';
+// import ManageCoursesPage from './Components/StaffManagingCoursesPage';
+// import AssignInstructorsPage from './Components/StaffAssigningInstructorsPage';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -36,7 +36,7 @@ function App() {
 
         {/* Route for the system admin dashboard */}
         <Route
-          path="/systemAdminDashboard"
+          path="/adminDashboard"
           element={isLoggedIn ? <SystemAdminDashboard/> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
         />
 
@@ -51,20 +51,8 @@ function App() {
           path="/WhatIfPage"
           element={<WhatIfPage />}
         />
-
-        {/* Route for the what if page */}
-        <Route
-          path="/manage_courses"
-          element={<ManageCoursesPage />}
-        />
-
-        {/* Route for the what if page */}
-        <Route
-          path="/assign_instructors"
-          element={<AssignInstructorsPage />}
-        />
       </Routes>
-    </Router> 
+    </Router>
 
     // <div className="App">
     //   {/* <InstructorDashboard/> */}
