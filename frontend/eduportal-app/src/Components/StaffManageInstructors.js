@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import StaffInstructorsTable from './StaffInstructorsTable';
+import StaffManageInstructorsTable from './StaffManageInstructorsTable';
 
 const StaffManageInstructors = () => {
     const [instructors, setInstructors] = useState([]);
@@ -118,7 +118,7 @@ const StaffManageInstructors = () => {
                 </div>
             </div>
             {/* Table */}
-            <StaffInstructorsTable instructors={instructors} />
+            <StaffManageInstructorsTable instructors={instructors} />
         </div>
     );
 };

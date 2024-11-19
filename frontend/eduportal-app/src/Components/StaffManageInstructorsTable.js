@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const StaffManageInstructorsTable = () => {
     const [instructors, setInstructors] = useState([]); // State to store instructor data
     const [error, setError] = useState(''); // State for error handling
+    const [showPasswords, setShowPasswords] = useState(false); // State to toggle password visibility
 
     useEffect(() => {
         const fetchInstructors = async () => {
@@ -25,6 +26,16 @@ const StaffManageInstructorsTable = () => {
             <h1 className="text-center mb-4">Instructors in Your Department</h1>
             {error && <div className="alert alert-danger">{error}</div>}
 
+            {/* Toggle Button */}
+            <div className="text-end mb-3">
+                <button
+                    className="btn btn-sm btn-outline-primary"
+                    onClick={() => setShowPasswords((prev) => !prev)}
+                >
+                    {showPasswords ? "Hide Passwords" : "Show Passwords"}
+                </button>
+            </div>
+
             <table className="table table-striped table-bordered">
                 <thead>
                     <tr>
@@ -38,7 +49,7 @@ const StaffManageInstructorsTable = () => {
                         <tr key={instructor.instructor_id}>
                             <td>{instructor.instructor_id}</td>
                             <td>{instructor.username}</td>
-                            <td>{instructor.password}</td>
+                            <td>{showPasswords ? instructor.password : "******"}</td>
                         </tr>
                     ))}
                 </tbody>

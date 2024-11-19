@@ -6,6 +6,7 @@ const StaffStudentsTable = () => {
     const [students, setStudents] = useState([]);
     const [department, setDepartment] = useState(""); // State for department name
     const [error, setError] = useState("");
+    const [showPasswords, setShowPasswords] = useState(false); // State to toggle password visibility
 
     // Fetch students and department name when the component mounts
     useEffect(() => {
@@ -38,6 +39,16 @@ const StaffStudentsTable = () => {
             </h1>
             {error && <div className="alert alert-danger">{error}</div>}
 
+            {/* Toggle Button */}
+            <div className="text-end mb-3">
+                <button
+                    className="btn btn-sm btn-outline-primary"
+                    onClick={() => setShowPasswords((prev) => !prev)}
+                >
+                    {showPasswords ? "Hide Passwords" : "Show Passwords"}
+                </button>
+            </div>
+
             <table className="table table-striped table-bordered">
                 <thead>
                     <tr>
@@ -52,7 +63,7 @@ const StaffStudentsTable = () => {
                         <tr key={student.id}>
                             <td>{student.id}</td>
                             <td>{student.username}</td>
-                            <td>{student.password}</td>
+                            <td>{showPasswords ? student.password : "******"}</td>
                             <td>{student.major}</td>
                         </tr>
                     ))}
