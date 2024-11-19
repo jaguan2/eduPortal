@@ -9,6 +9,7 @@ import WhatIfPage from './Routes/WhatIfPage';
 import InstructorDashboard from './Routes/InstructorDashboard';
 import SystemAdminDashboard from './Routes/SystemAdminDashboard';
 import StaffDashboard from './Routes/StaffDashboard';
+import AdvisorDashboard from './Routes/AdvisorDashboard';
 // import ManageCoursesPage from './Components/StaffManagingCoursesPage';
 // import AssignInstructorsPage from './Components/StaffAssigningInstructorsPage';
 
@@ -44,6 +45,12 @@ function App() {
         <Route
           path="/staffDashboard"
           element={isLoggedIn ? <StaffDashboard/> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
+        />
+
+        {/* Route for the system admin dashboard */}
+        <Route
+          path="/advisorDashboard"
+          element={isLoggedIn ? <AdvisorDashboard/> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
         />
 
         {/* Route for the what if page */}

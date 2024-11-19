@@ -47,7 +47,7 @@ function LoginPage({ setIsLoggedIn, setUserRole }) {
 
     return (
         <Container className="mt-5" style={{ maxWidth: '400px' }}>
-            <h1 className="text-center mb-4">Sign In</h1>
+            <h1 className="text-center mb-4">EduPortal</h1>
             <Form onSubmit={handleLogin}>
                 {/* Username Input */}
                 <Form.Group controlId="username" className="mb-3">

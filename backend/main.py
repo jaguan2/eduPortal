@@ -691,6 +691,263 @@ def admin_gpa_statistics():
     finally:
         conn.close()
 
+# ADVISOR FLASK ROUTES
+@app.route('/addClass', methods=['GET', 'POST'])
+def addClass():
+    if 'user_id' in session and 'role' in session:
+        user_id = int(session['user_id'])
+        role = session['role']
+
+        # Connect to the database
+        conn = sqlite3.connect('eduPortalDB.db')
+        cursor = conn.cursor()
+
+        if request.method == 'GET':
+            # Query might be wrong
+            query = "SELECT * FROM courses WHERE id NOT IN (SELECT course FROM taken WHERE student = '" + str(user_id) + "' );"
+
+            cursor.execute(query)
+            courses = cursor.fetchall()
+
+            # Close the connection
+            conn.close()
+
+            # If no courses are found, return an empty list (test statement)
+            if not courses:
+                return jsonify({"message": "No new courses available"}), 200
+
+            # Return the list of courses as JSON
+            courses_list = [
+                {
+                    "id": course[0],
+                    "prefix": course[1],
+                    "number": course[2],
+                    "courseName": course[3],
+                    "credits": course[4],
+                    "semester": course[5],
+                    "year": course[6],
+                    "classTime": course[7],
+                    "instructor": course[8]
+                }
+                for course in courses
+            ]
+
+            return jsonify(courses_list), 200
+
+        if request.method == 'POST':
+            data = request.json
+            course_ids = data.get('course_ids')  # list of course IDs
+
+            if not course_ids:
+                return jsonify({"error": "No courses selected"}), 400
+
+            # Connect to the database for POST request
+            conn = sqlite3.connect('eduPortalDB.db')
+            cursor = conn.cursor()
+
+            for course_id in course_ids:
+                # checks if student is already in the same course (hopefully)
+                query = (
+                    "SELECT * FROM taken WHERE student = " + str(user_id) + 
+                    " AND course = " + str(course_id) + 
+                    " AND semester = (SELECT semester FROM courses WHERE id = " + str(course_id) + ")"
+                )
+
+                cursor.execute(query)  # No need to pass parameters here as they are already concatenated in the query
+                
+                taken_course = cursor.fetchone()
+
+                # If the student is already enrolled in the course in the same semester, return an error
+                if taken_course:
+                    return jsonify({"error": f"Student has already taken course {course_id} in this semester"}), 400
+
+                # If not enrolled, insert the course into the 'taken' table
+                insert_course = "INSERT INTO taken(student, course) VALUES (" + str(user_id) + ", " + str(course_id) + ")"
+                cursor.execute(insert_course)
+
+            # Commit changes and close the connection
+            conn.commit()
+            conn.close()
+
+            return jsonify({"message": "Courses successfully added"}), 200
+
+
+@app.route('/dropClass', methods=['GET', 'POST'])
+def dropClass():
+    if 'user_id' in session and 'role' in session:
+        user_id = int(session['user_id'])
+        role = session['role']
+
+        # Connect to the database
+        conn = sqlite3.connect('eduPortalDB.db')
+        cursor = conn.cursor()
+
+        if request.method == 'GET':
+            # Fetch courses that the student is currently enrolled in
+            query = "SELECT * FROM courses c JOIN taken t ON WHERE t.student = " + str(user_id) + " AND t.course = c.id;"
+
+            cursor.execute(query)
+            courses = cursor.fetchall()
+
+            # Close the connection
+            conn.close()
+
+            # If no courses are found, return an empty list (test statement)
+            if not courses:
+                return jsonify({"message": "No courses found"}), 200
+
+            # Return the list of courses as JSON
+            courses_list = [
+                {
+                    "id": course[0],
+                    "prefix": course[1],
+                    "number": course[2],
+                    "courseName": course[3],
+                    "credits": course[4],
+                    "semester": course[5],
+                    "year": course[6],
+                    "classTime": course[7],
+                    "instructor": course[8]
+                }
+                for course in courses
+            ]
+
+            return jsonify(courses_list), 200
+
+        if request.method == 'POST':
+            data = request.json
+            course_ids = data.get('course_ids')  # Expecting a list of course IDs
+
+            if not course_ids:
+                return jsonify({"error": "No courses selected"}), 400
+
+            # Connect to the database for POST request
+            conn = sqlite3.connect('eduPortalDB.db')
+            cursor = conn.cursor()
+
+            for course_id in course_ids:
+                # Check if the student is enrolled in the selected course in the 'taken' table
+                check_query = (
+                    "SELECT * FROM taken WHERE student = " + str(user_id) +
+                    " AND course = " + str(course_id) +
+                    " AND semester = (SELECT semester FROM courses WHERE id = " + str(course_id) + ");"
+                )
+
+                cursor.execute(check_query)
+                taken_course = cursor.fetchone()
+
+                # If the student is enrolled in the course, delete it from 'taken'
+                if taken_course:
+                    delete_query = (
+                        "DELETE FROM taken WHERE student = " + str(user_id) +
+                        " AND course = " + str(course_id) +
+                        " AND semester = (SELECT semester FROM courses WHERE id = " + str(course_id) + ")"
+                    )
+                    cursor.execute(delete_query)
+
+                else:
+                    return jsonify({"error": f"Student is not enrolled in course {course_id}"}), 400
+
+            # Commit the changes and close the connection
+            conn.commit()
+            conn.close()
+
+            return jsonify({"message": "Courses successfully dropped"}), 200
+
+@app.route('/advisorStudentList', methods=['GET'])
+def advisorStudentList():
+
+    current_user = 1 #hardcoded
+    
+    role = "advisor"  
+    
+    # Connect to the database
+    conn = sqlite3.connect('eduPortalDB.db')
+    cursor = conn.cursor()
+
+    # Get the students for the advisor using the current_user (advisor id)
+    students_query = (" \
+        select s.id as id, s.username as username, m.majorName as major from (students s join major m on s.major = m.id) \
+        as new_s join advisors a on new_s.department = a.department \
+        WHERE a.id = " + str(current_user) + ";")
+    
+    # cursor.execute(students_query, (current_user,))
+    # students = cursor.fetchall()
+
+    students_df = pd.read_sql(students_query, conn)
+
+    students_json = students_df.to_dict(orient='records')
+
+    conn.close()
+
+    if not students_json:
+        return jsonify({"message": "No students found for this advisor"}), 200
+
+    return jsonify(students_json), 200
+
+# Temporary hardcode for correct username output on dashboards
+@app.route("/getAdvisorName", methods=["GET"])
+def getAdvisorName():
+    current_user = "1"  # Hardcoded for testing
+    role = "advisors"
+
+    conn = get_db_connection()
+
+    try:
+        query = f"SELECT username FROM {role} WHERE id = ?;"
+        user_df = pd.read_sql(query, conn, params=(current_user,))
+
+        if not user_df.empty:
+            username = user_df.iloc[0]['username']
+            return jsonify({"username": username}), 200
+        else:
+            return jsonify({"error": "Advisor not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/getInstructorName", methods=["GET"])
+def getInstructorName():
+    current_user = "1"  # Hardcoded for testing
+    role = "instructors"
+
+    conn = get_db_connection()
+
+    try:
+        query = f"SELECT username FROM {role} WHERE id = ?;"
+        user_df = pd.read_sql(query, conn, params=(current_user,))
+
+        if not user_df.empty:
+            username = user_df.iloc[0]['username']
+            return jsonify({"username": username}), 200
+        else:
+            return jsonify({"error": "Instructor not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/getAdminName", methods=["GET"])
+def getAdminName():
+    current_user = "1"  # Hardcoded for testing
+    role = "admin"
+
+    conn = get_db_connection()
+
+    try:
+        query = f"SELECT username FROM {role} WHERE id = ?;"
+        user_df = pd.read_sql(query, conn, params=(current_user,))
+
+        if not user_df.empty:
+            username = user_df.iloc[0]['username']
+            return jsonify({"username": username}), 200
+        else:
+            return jsonify({"error": "Admin not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
 
 if __name__ == "__main__":
     app.run(debug=True)

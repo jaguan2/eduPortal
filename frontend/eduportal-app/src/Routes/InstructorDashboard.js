@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './InstructorDashboard.css';
 import InstructorNavigation from '../Components/InstructorNavigation';
 import CourseTable from '../Components/InstructorCourseTable';
-import Profile from '../Components/Profile';
+import Profile from '../Components/InstructorProfile';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const InstructorDashboard = () => {
