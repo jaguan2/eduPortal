@@ -565,5 +565,132 @@ def getStaffName():
     finally:
         conn.close()
 
+@app.route("/manage_instructors", methods=['POST'])
+def manage_instructors():
+    """Manage instructor operations: add, update, or delete."""
+    data = request.json
+    action = data.get('action')  # 'add', 'update', 'delete'
+    instructor_id = data.get('id')
+    username = data.get('username')
+    password = data.get('password')
+    department_id = 1  # Hardcoded department ID
+
+    conn = get_db_connection()
+    try:
+        if action == 'add':
+            conn.execute('INSERT INTO instructors (username, password, department) VALUES (?, ?, ?)',
+                         (username, password, department_id))
+        elif action == 'update':
+            conn.execute('UPDATE instructors SET username = ?, password = ?, department = ? WHERE id = ?',
+                         (username, password, department_id, instructor_id))
+        elif action == 'delete':
+            conn.execute('DELETE FROM instructors WHERE id = ?', (instructor_id,))
+        else:
+            return jsonify({'error': 'Invalid action'}), 400
+        conn.commit()
+        return jsonify({'message': 'Operation successful'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+
+@app.route("/manage_advisors", methods=['POST'])
+def manage_advisors():
+    """Manage advisor operations: add, update, or delete."""
+    data = request.json
+    action = data.get('action')  # 'add', 'update', 'delete'
+    advisor_id = data.get('id')
+    username = data.get('username')
+    password = data.get('password')
+    department_id = 1  # Hardcoded department ID
+
+    conn = get_db_connection()
+    try:
+        if action == 'add':
+            conn.execute('INSERT INTO advisors (username, password, department) VALUES (?, ?, ?)',
+                         (username, password, department_id))
+        elif action == 'update':
+            conn.execute('UPDATE advisors SET username = ?, password = ?, department = ? WHERE id = ?',
+                         (username, password, department_id, advisor_id))
+        elif action == 'delete':
+            conn.execute('DELETE FROM advisors WHERE id = ?', (advisor_id,))
+        else:
+            return jsonify({'error': 'Invalid action'}), 400
+        conn.commit()
+        return jsonify({'message': 'Operation successful'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/getStaffAdvisors", methods=['GET'])
+def get_staff_advisors():
+    """Fetch all advisors for the hardcoded department."""
+    department_id = 1  # Hardcoded department ID
+    conn = get_db_connection()
+    try:
+        query = '''
+            SELECT id, username, department
+            FROM advisors
+            WHERE department = ?;
+        '''
+        advisors = conn.execute(query, (department_id,)).fetchall()
+        advisors_list = [dict(row) for row in advisors]
+        return jsonify(advisors_list), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/admin_gpa_statistics", methods=["GET"])
+def admin_gpa_statistics():
+    """Fetch highest, lowest, and average GPA for each major."""
+    conn = get_db_connection()
+    try:
+        query = """
+        SELECT 
+            major.majorName AS major,
+            MAX(student_gpa.gpa) AS highest_gpa,
+            MIN(student_gpa.gpa) AS lowest_gpa,
+            AVG(student_gpa.gpa) AS average_gpa
+        FROM 
+            (
+                SELECT 
+                    students.id AS student_id,
+                    students.major AS major_id,
+                    AVG(taken.grade) AS gpa
+                FROM 
+                    taken
+                JOIN 
+                    students ON taken.student = students.id
+                GROUP BY 
+                    students.id
+            ) AS student_gpa
+        JOIN 
+            major ON student_gpa.major_id = major.id
+        GROUP BY 
+            major.majorName;
+        """
+        cursor = conn.execute(query)
+        results = cursor.fetchall()
+
+        # Convert query results to a list of dictionaries
+        data = [
+            {
+                "major": row[0],
+                "highest_gpa": row[1],
+                "lowest_gpa": row[2],
+                "average_gpa": row[3]
+            }
+            for row in results
+        ]
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+
 if __name__ == "__main__":
     app.run(debug=True)

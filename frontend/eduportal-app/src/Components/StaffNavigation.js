@@ -3,6 +3,8 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ManageCoursesPage from './StaffManagingCoursesPage';
 import AssignInstructorsPage from './StaffAssigningInstructorsPage';
+import StaffManageAdvisors from './StaffManageAdvisors';
+import StaffManageInstructors from './StaffManageInstructors';
 import './StaffNavigation.css';
 
 const StaffNavigation = () => {
@@ -74,13 +76,28 @@ const StaffNavigation = () => {
                     >
                         Assign Instructors
                     </button>
+                    <button
+                        className={`btn btn-outline-success ${activePage === 'manage_advisors' ? 'active' : ''}`}
+                        onClick={() => setActivePage('manage_advisors')}
+                    >
+                        Manage Advisors
+                    </button>
+                    <button
+                        className={`btn btn-outline-warning ${activePage === 'manage_instructors' ? 'active' : ''}`}
+                        onClick={() => setActivePage('manage_instructors')}
+                    >
+                        Manage Instructors
+                    </button>
                 </div>
+
             </div>
 
             {/* Render Active Page */}
             <div className="row">
                 {activePage === 'manage_courses' && <ManageCoursesPage />}
                 {activePage === 'assign_instructors' && <AssignInstructorsPage />}
+                {activePage === 'manage_advisors' && <StaffManageAdvisors />}
+                {activePage === 'manage_instructors' && <StaffManageInstructors />}
             </div>
         </div>
     );
