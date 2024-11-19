@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import axios from 'axios'; // Import Axios
-import './StudentCourseTable.css'
+import axios from 'axios';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Typography,
+    CircularProgress,
+    Alert,
+} from '@mui/material';
 
 const CourseTable = () => {
-    // api call to get data
     const [rows, setRows] = useState([]);
-    const [error, setError] = useState(''); // State for handling errors
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         const fetchRows = async () => {
@@ -15,40 +25,60 @@ const CourseTable = () => {
                 setRows(response.data);
             } catch (error) {
                 if (error.response) {
-                    setError(error.response.data.error);
+                    setError(error.response.data.error || 'Failed to fetch data.');
                 } else {
                     setError('An unexpected error occurred!');
                 }
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchRows();
     }, []);
 
+    if (loading) {
+        return (
+            <Typography align="center" marginY={3}>
+                <CircularProgress />
+            </Typography>
+        );
+    }
+
+    if (error) {
+        return (
+            <Alert severity="error" style={{ marginBottom: '2rem' }}>
+                {error}
+            </Alert>
+        );
+    }
+
     return (
-        <table className="table table-striped container">
-            <thead>
-                <tr>
-                    <th scope="col">Course</th>
-                    <th scope="col">Semester</th>
-                    <th scope="col">Year</th>
-                    <th scope="col">Credits</th>
-                    <th scope="col">Grade</th>
-                </tr>
-            </thead>
-            <tbody>
-                {rows.map((data, index) => (
-                    <tr>
-                        <td scope="row">{data.course}</td>
-                        <td scope="row">{data.semester}</td>
-                        <td scope="row">{data.year}</td>
-                        <td scope="row">{data.credits}</td>
-                        <td scope="row">{data.grade}</td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    )
-}
+        <TableContainer component={Paper} elevation={3}>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell><strong>Course</strong></TableCell>
+                        <TableCell><strong>Semester</strong></TableCell>
+                        <TableCell><strong>Year</strong></TableCell>
+                        <TableCell><strong>Credits</strong></TableCell>
+                        <TableCell><strong>Grade</strong></TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {rows.map((data, index) => (
+                        <TableRow key={index}>
+                            <TableCell>{data.course}</TableCell>
+                            <TableCell>{data.semester}</TableCell>
+                            <TableCell>{data.year}</TableCell>
+                            <TableCell>{data.credits}</TableCell>
+                            <TableCell>{data.grade}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    );
+};
 
 export default CourseTable;

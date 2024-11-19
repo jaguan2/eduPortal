@@ -1,0 +1,67 @@
+/* Buttons */
+.custom-button {
+    background-color: #606c38;
+    color: #fefae0;
+    border: 1px solid #283618;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.custom-button:hover {
+    background-color: #283618;
+    color: #dda15e;
+}
+
+/* Typography */
+.custom-typography {
+    font-family: 'Roboto', sans-serif;
+    color: #283618;
+}
+
+/* Container Background */
+.custom-container {
+    background-color: #fefae0;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #dda15e;
+}
+
+/* Tables */
+.custom-table {
+    border: 1px solid #283618;
+    border-collapse: collapse;
+    width: 100%;
+    background-color: #fefae0;
+}
+
+.custom-table th {
+    background-color: #bc6c25;
+    color: #fefae0;
+    padding: 10px;
+    text-align: left;
+}
+
+.custom-table td {
+    padding: 10px;
+    border: 1px solid #283618;
+}
+
+/* Cards */
+.custom-card {
+    background-color: #dda15e;
+    color: #fefae0;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Alerts */
+.custom-alert {
+    background-color: #bc6c25;
+    color: #fefae0;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+}

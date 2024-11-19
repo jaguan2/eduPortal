@@ -1,41 +1,84 @@
 import React from 'react';
-import './StudentDashboard.css';
-import StudentNavigation from '../Components/StudentNavigation';
-import CourseTable from '../Components/StudentCourseTable';
+import { useNavigate } from 'react-router-dom';
+import { Container, Paper, Grid, Typography, Button } from '@mui/material';
 import Profile from '../Components/Profile';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import CourseTable from '../Components/StudentCourseTable';
 
 const StudentDashboard = () => {
+    const UID = 'U11000001'; // Hardcoded UID
+    const GPA = '3.75'; // Hardcoded GPA for demonstration
+    const navigate = useNavigate(); // React Router hook for navigation
+
+    const handleWhatIf = () => {
+        navigate('/WhatIfPage'); // Navigate to the What-If page
+    };
+
+    const handleLogout = () => {
+        window.location.href = '/'; // Redirect to login page
+    };
+
     return (
+        <Container maxWidth="lg" style={{ marginTop: '2rem' }}>
+            {/* Unified Profile and Navigation Section */}
+            <Paper elevation={3} style={{ padding: '2rem', marginBottom: '2rem' }}>
+                <Grid container spacing={3} alignItems="center">
+                    {/* Profile */}
+                    <Grid item xs={12} md={3}>
+                        <Profile />
+                    </Grid>
 
-        <div className="StudentDashboard container text-center">
-            {/* Row 1: Student Head */}
-            <div className="StudentHead row align-items-center mb-5">
-                {/* Profile */}
-                <div className="col"> {/* col-12 for small screens, col-md-4 for medium and up */}
-                    <Profile />
-                </div>
+                    {/* UID and GPA */}
+                    <Grid item xs={12} md={6}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={6}>
+                                <Typography variant="body1">
+                                    <strong>UID:</strong> {UID}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography variant="body1">
+                                    <strong>GPA:</strong> {GPA}
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                    </Grid>
 
-                {/* Student Navigation */}
-                <div className="col d-flex justify-content-end"> {/* col-12 for small screens, col-md-8 for medium and up */}
-                    <StudentNavigation />
-                </div>
-            </div>
+                    {/* Buttons */}
+                    <Grid item xs={12} md={3}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={6}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    fullWidth
+                                    onClick={handleWhatIf}
+                                >
+                                    What-If
+                                </Button>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Button
+                                    variant="contained"
+                                    color="error"
+                                    fullWidth
+                                    onClick={handleLogout}
+                                >
+                                    Log Out
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Paper>
 
-            {/* Row 2: Course Title */}
-            <div className="StudentCoursesTitle row mb-3">
-                <div className="col">
-                    <h3>Course List</h3>
-                </div>
-            </div>
-            
-            {/* Row 3: Course Table */}
-            <div className="StudentCourseList row">
-                <div className="col">
-                    <CourseTable />
-                </div>
-            </div>
-        </div>
+            {/* Course List Section */}
+            <Paper elevation={3} style={{ padding: '2rem' }}>
+                <Typography variant="h5" align="center" gutterBottom>
+                    Course List
+                </Typography>
+                <CourseTable />
+            </Paper>
+        </Container>
     );
 };
 
