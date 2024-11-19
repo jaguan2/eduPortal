@@ -52,10 +52,10 @@ const SystemAdminNavigation = () => {
                     <div className="InfoLabel item">UID:</div>
                     <div className="InfoData item">{UID}</div>
                 </div>
-                <div className="Info col">
+                {/* <div className="Info col">
                     <div className="InfoLabel item">Dept:</div>
                     <div className="InfoData item">{department}</div>
-                </div>
+                </div> */}
             </div>
         </div>
     )

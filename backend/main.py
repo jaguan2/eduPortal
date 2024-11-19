@@ -387,6 +387,24 @@ def getStaffInstructors():
     finally:
         conn.close()
 
+@app.route("/getStaffManageInstructors", methods=['GET'])
+def getStaffManageInstructors():
+    """Fetch all instructors under the same department as the hardcoded staff user, including their password."""
+    conn = get_db_connection()
+    query = '''
+        SELECT id AS instructor_id, username, password
+        FROM instructors
+        WHERE department = ?;
+    '''
+    try:
+        instructors = conn.execute(query, (StaffDepartment_ID,)).fetchall()
+        return jsonify([dict(instructor) for instructor in instructors]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+
 @app.route("/getStaffCourses", methods=['GET'])
 def getStaffCourses():
     """Fetch all courses under the same department as the hardcoded staff user."""
@@ -593,6 +611,142 @@ def manage_instructors():
         return jsonify({'error': str(e)}), 500
     finally:
         conn.close()
+
+@app.route("/getStaffMajors", methods=["GET"])
+def getStaffMajors():
+    """Fetch all majors for the staff's department."""
+    # Example: Hardcoded staff department for testing
+    staff_department_id = 1  # Replace this with dynamic retrieval later
+
+    conn = get_db_connection()
+    try:
+        # Query to fetch majors belonging to the staff's department
+        query = """
+        SELECT id, majorName
+        FROM major
+        WHERE department = ?
+        """
+        cursor = conn.execute(query, (staff_department_id,))
+        results = cursor.fetchall()
+
+        # If no majors are found, return a friendly error
+        if not results:
+            return jsonify({"error": "No majors found for this department"}), 404
+
+        # Format the results into a list of dictionaries
+        majors = [{"id": row[0], "majorName": row[1]} for row in results]
+        return jsonify({"majors": majors}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/manage_students", methods=['POST'])
+def manage_students():
+    """Manage student operations: add, update, or delete."""
+    data = request.json
+    action = data.get('action')  # 'add', 'update', 'delete'
+    student_id = data.get('id')
+    username = data.get('username')
+    password = data.get('password')
+    major_id = data.get('major')  # Include major
+
+    conn = get_db_connection()
+
+    try:
+        if action == 'add':
+            # Add a new student
+            conn.execute(
+                '''
+                INSERT INTO students (username, password, major)
+                VALUES (?, ?, ?)
+                ''',
+                (username, password, major_id)
+            )
+            conn.commit()
+            return jsonify({'message': 'Student added successfully'}), 200
+
+        elif action == 'update':
+            # Update an existing student
+            conn.execute(
+                '''
+                UPDATE students
+                SET username = ?, password = ?, major = ?
+                WHERE id = ?
+                ''',
+                (username, password, major_id, student_id)
+            )
+            conn.commit()
+            return jsonify({'message': 'Student updated successfully'}), 200
+
+        elif action == 'delete':
+            # Ensure student is not the only one in their major before deletion
+            major_students = conn.execute(
+                'SELECT COUNT(*) FROM students WHERE major = ?', (major_id,)
+            ).fetchone()[0]
+            if major_students <= 1:
+                return jsonify({'error': 'Cannot delete the only student in this major'}), 400
+
+            conn.execute('DELETE FROM students WHERE id = ?', (student_id,))
+            conn.commit()
+            return jsonify({'message': 'Student deleted successfully'}), 200
+
+        else:
+            return jsonify({'error': 'Invalid action'}), 400
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/getStaffStudents", methods=["GET"])
+def getStaffStudents():
+    """Fetch all students from the same department as the staff."""
+    # Simulated staff ID and department for testing (replace with actual session/user management later)
+    staff_id = 1  # Hardcoded for testing
+    conn = get_db_connection()
+
+    try:
+        # Fetch the department ID of the staff member
+        staff_department_query = "SELECT department FROM staff WHERE id = ?"
+        staff_department = conn.execute(staff_department_query, (staff_id,)).fetchone()
+
+        if not staff_department:
+            return jsonify({"error": "Staff not found"}), 404
+
+        # Fetch students from the same department
+        department_id = staff_department[0]
+        query = """
+        SELECT 
+            students.id, 
+            students.username, 
+            students.password, 
+            major.majorName 
+        FROM 
+            students
+        JOIN 
+            major ON students.major = major.id
+        WHERE 
+            major.department = ?
+        """
+        students = conn.execute(query, (department_id,)).fetchall()
+
+        # Convert results to JSON format
+        results = [
+            {
+                "id": row[0],
+                "username": row[1],
+                "password": row[2],
+                "major": row[3]
+            }
+            for row in students
+        ]
+        return jsonify({"students": results}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
 
 
 @app.route("/manage_advisors", methods=['POST'])
@@ -944,6 +1098,58 @@ def getAdminName():
             return jsonify({"username": username}), 200
         else:
             return jsonify({"error": "Admin not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/admin_department_gpa_rankings", methods=["GET"])
+def admin_department_gpa_rankings():
+    """Rank all departments by average GPA, including highest and lowest GPAs."""
+    conn = get_db_connection()
+    try:
+        query = """
+        SELECT 
+            department.departmentName AS department_name,
+            MAX(student_gpa.gpa) AS highest_gpa,
+            MIN(student_gpa.gpa) AS lowest_gpa,
+            AVG(student_gpa.gpa) AS average_gpa
+        FROM 
+            (
+                SELECT 
+                    students.id AS student_id,
+                    major.department AS department_id,
+                    AVG(taken.grade) AS gpa
+                FROM 
+                    taken
+                JOIN 
+                    students ON taken.student = students.id
+                JOIN 
+                    major ON students.major = major.id
+                GROUP BY 
+                    students.id
+            ) AS student_gpa
+        JOIN 
+            department ON student_gpa.department_id = department.id
+        GROUP BY 
+            department.departmentName
+        ORDER BY 
+            average_gpa DESC;
+        """
+        cursor = conn.execute(query)
+        results = cursor.fetchall()
+
+        # Convert query results to a list of dictionaries
+        data = [
+            {
+                "department_name": row[0],
+                "highest_gpa": row[1],
+                "lowest_gpa": row[2],
+                "average_gpa": row[3]
+            }
+            for row in results
+        ]
+        return jsonify(data), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:

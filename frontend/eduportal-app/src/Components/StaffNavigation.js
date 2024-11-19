@@ -5,6 +5,7 @@ import ManageCoursesPage from './StaffManagingCoursesPage';
 import AssignInstructorsPage from './StaffAssigningInstructorsPage';
 import StaffManageAdvisors from './StaffManageAdvisors';
 import StaffManageInstructors from './StaffManageInstructors';
+import StaffManageStudents from './StaffManageStudents';
 import './StaffNavigation.css';
 
 const StaffNavigation = () => {
@@ -65,6 +66,12 @@ const StaffNavigation = () => {
             <div className="row mb-4 justify-content-center">
                 <div className="btn-group">
                     <button
+                        className={`btn btn-outline-info ${activePage === 'manage_students' ? 'active' : ''}`}
+                        onClick={() => setActivePage('manage_students')}
+                    >
+                        Manage Students
+                    </button>
+                    <button
                         className={`btn btn-outline-primary ${activePage === 'manage_courses' ? 'active' : ''}`}
                         onClick={() => setActivePage('manage_courses')}
                     >
@@ -77,27 +84,28 @@ const StaffNavigation = () => {
                         Assign Instructors
                     </button>
                     <button
-                        className={`btn btn-outline-success ${activePage === 'manage_advisors' ? 'active' : ''}`}
-                        onClick={() => setActivePage('manage_advisors')}
-                    >
-                        Manage Advisors
-                    </button>
-                    <button
                         className={`btn btn-outline-warning ${activePage === 'manage_instructors' ? 'active' : ''}`}
                         onClick={() => setActivePage('manage_instructors')}
                     >
                         Manage Instructors
                     </button>
+                    <button
+                        className={`btn btn-outline-success ${activePage === 'manage_advisors' ? 'active' : ''}`}
+                        onClick={() => setActivePage('manage_advisors')}
+                    >
+                        Manage Advisors
+                    </button>
                 </div>
-
             </div>
+
 
             {/* Render Active Page */}
             <div className="row">
+                {activePage === 'manage_students' && <StaffManageStudents />}
                 {activePage === 'manage_courses' && <ManageCoursesPage />}
                 {activePage === 'assign_instructors' && <AssignInstructorsPage />}
-                {activePage === 'manage_advisors' && <StaffManageAdvisors />}
                 {activePage === 'manage_instructors' && <StaffManageInstructors />}
+                {activePage === 'manage_advisors' && <StaffManageAdvisors />}
             </div>
         </div>
     );
