@@ -10,8 +10,6 @@ import InstructorDashboard from './Routes/InstructorDashboard';
 import SystemAdminDashboard from './Routes/SystemAdminDashboard';
 import StaffDashboard from './Routes/StaffDashboard';
 import AdvisorDashboard from './Routes/AdvisorDashboard';
-// import ManageCoursesPage from './Components/StaffManagingCoursesPage';
-// import AssignInstructorsPage from './Components/StaffAssigningInstructorsPage';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
