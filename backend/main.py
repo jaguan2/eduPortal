@@ -845,6 +845,142 @@ def admin_gpa_statistics():
     finally:
         conn.close()
 
+@app.route("/getSystemAdminSemesterCourseStats", methods=["GET"])
+def get_admin_semester_course_stats():
+    """
+    Fetch total enrollments and average grade for each course semester by semester.
+    """
+    conn = get_db_connection()
+    try:
+        # SQL Query
+        query = """
+        SELECT 
+            courses.id AS course_id,
+            courses.prefix || ' ' || courses.number AS course_code,
+            courses.courseName AS course_name,
+            courses.semester,
+            courses.year,
+            COUNT(taken.student) AS total_enrollments,
+            AVG(taken.grade) AS average_grade
+        FROM 
+            courses
+        LEFT JOIN 
+            taken ON courses.id = taken.course
+        GROUP BY 
+            courses.id, courses.semester, courses.year
+        ORDER BY 
+            courses.year, courses.semester, courses.id;
+        """
+        
+        # Execute query
+        cursor = conn.execute(query)
+        results = cursor.fetchall()
+
+        # Convert results to JSON format
+        data = [
+            {
+                "course_id": row["course_id"],
+                "course_code": row["course_code"],
+                "course_name": row["course_name"],
+                "semester": row["semester"],
+                "year": row["year"],
+                "total_enrollments": row["total_enrollments"],
+                "average_grade": round(row["average_grade"], 2) if row["average_grade"] is not None else None
+            }
+            for row in results
+        ]
+        
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/getSystemAdminInstructorStudentByMajor", methods=["GET"])
+def getSystemAdminInstructorStudentByMajor():
+    """
+    For each instructor, list total students by major of every course he/she teaches regardless of semester.
+    """
+    conn = get_db_connection()
+    try:
+        query = """
+        SELECT 
+            instructors.id AS instructor_id,
+            instructors.username AS instructor_name,
+            major.majorName AS major_name,
+            COUNT(DISTINCT taken.student) AS total_students
+        FROM instructors
+        JOIN courses ON instructors.id = courses.instructor
+        JOIN taken ON courses.id = taken.course
+        JOIN students ON taken.student = students.id
+        JOIN major ON students.major = major.id
+        GROUP BY instructors.id, major.id
+        ORDER BY instructors.id, major_name;
+        """
+        cursor = conn.execute(query)
+        results = cursor.fetchall()
+
+        # Organize the data into a structured format
+        data = []
+        for row in results:
+            data.append({
+                "instructor_id": row[0],
+                "instructor_name": row[1],
+                "major_name": row[2],
+                "total_students": row[3]
+            })
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route("/getListStudentsByMajor", methods=["GET"])
+def getListStudentsByMajor():
+    """
+    List all students by major, sorted within each major by their total credits in descending order.
+    """
+    conn = get_db_connection()
+    try:
+        query = """
+            SELECT
+                major.majorName AS major_name,
+                students.id AS student_id,
+                students.username AS student_name,
+                SUM(courses.credits) AS total_credits
+            FROM
+                students
+            LEFT JOIN
+                taken ON students.id = taken.student
+            LEFT JOIN
+                courses ON taken.course = courses.id
+            JOIN
+                major ON students.major = major.id
+            GROUP BY
+                major.majorName, students.id, students.username
+            ORDER BY
+                major.majorName ASC, total_credits DESC;
+        """
+        cursor = conn.execute(query)
+        results = cursor.fetchall()
+
+        # Flatten the results for simpler frontend consumption
+        data = [
+            {
+                "major_name": row["major_name"],
+                "student_id": row["student_id"],
+                "student_name": row["student_name"],
+                "total_credits": row["total_credits"] or 0  # Handle NULL values
+            }
+            for row in results
+        ]
+
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
 # ADVISOR FLASK ROUTES
 @app.route('/addClass', methods=['GET', 'POST'])
 def addClass():

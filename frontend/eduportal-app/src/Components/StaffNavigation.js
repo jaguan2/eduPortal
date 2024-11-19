@@ -98,7 +98,6 @@ const StaffNavigation = () => {
                 </div>
             </div>
 
-
             {/* Render Active Page */}
             <div className="row">
                 {activePage === 'manage_students' && <StaffManageStudents />}

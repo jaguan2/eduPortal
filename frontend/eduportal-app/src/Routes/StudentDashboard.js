@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const StudentDashboard = () => {
     return (
+
         <div className="StudentDashboard container text-center">
             {/* Row 1: Student Head */}
             <div className="StudentHead row align-items-center mb-5">
@@ -20,7 +21,7 @@ const StudentDashboard = () => {
                     <StudentNavigation />
                 </div>
             </div>
-            
+
             {/* Row 2: Course Title */}
             <div className="StudentCoursesTitle row mb-3">
                 <div className="col">
