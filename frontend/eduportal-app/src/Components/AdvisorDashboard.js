@@ -1,8 +1,8 @@
 import React from 'react';
-import './AdvisorDashboard.css'; // Import the advisor-specific CSS
-import AdvisorNavigation from './AdvisorNavigation'; // Import the AdvisorNavigation component
-import CourseTable from './AdvisorTable'; // Assuming there's a CourseTable component for advisor
-import Profile from './Profile'; // Assuming the Profile component is also shared
+import './AdvisorDashboard.css'; 
+import AdvisorNavigation from './AdvisorNavigation';
+import CourseTable from './AdvisorTable'; 
+import Profile from './Profile'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const AdvisorDashboard = () => {
