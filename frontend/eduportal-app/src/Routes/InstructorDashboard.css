@@ -1,0 +1,33 @@
+.InstructorDashboard {
+    background-color: #f9f9f9;
+    padding: 20px;
+    margin-top: 5%;
+}
+
+.InstructorHead {
+    background-color: #e0f7fa;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.InstructorCoursesTitle h3 {
+    font-weight: bold;
+    color: #333;
+}
+
+.InstructorCourseList {
+    margin-top: 30px;
+    background-color: #ffffff;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.InstructoNavigation {
+    flex-grow: 1 !important;
+}
+
+.Filter {
+    justify-content: center;
+    gap: 10px;
+}
