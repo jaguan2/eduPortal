@@ -7,7 +7,7 @@
 //     // api call to get data
 //     const [rows, setRows] = useState([]);
 //     // const [selectedCourse, setSelectedCourse] = null([]);
-//     const [showNewTable, setShowNewTable] = useState(false);
+//     const [showStudentPerformanceTable, setShowStudentPerformanceTable] = useState(false);
 //     const [courseStudents, setCourseStudents] = useState([]);
 //     const [loading, setLoading] = useState(false);
 //     const [error, setError] = useState(''); // State for handling errors
@@ -38,9 +38,9 @@
 //         );
 //     });
 
-//     const handleShowNewTable = async (courseId) => {
+//     const handleShowStudentPerformanceTable = async (courseId) => {
 //         setLoading(true);
-//         setShowNewTable(true);
+//         setShowStudentPerformanceTable(true);
 //         setCourseStudents([]);
 //         try {
 //             const response = await axios.post('http://127.0.0.1:5000/getCourseStudents', {id: courseId});
@@ -58,14 +58,14 @@
 //         }
 //     };
 
-//     const handleBackToTable = () => {
-//         setShowNewTable(false);
+//     const handleStudentPerformanceTable = () => {
+//         setShowStudentPerformanceTable(false);
 //     }
 
 //     return (
 //         <div>
 //             {
-//                 showNewTable ? (
+//                 showStudentPerformanceTable ? (
 //                     <div>
 //                         <table className="table table-striped container">
 //                         <thead>
@@ -85,7 +85,7 @@
 //                             ))}
 //                         </tbody>
 //                         </table>
-//                         <button onClick={handleBackToTable}>Back</button>
+//                         <button onClick={handleStudentPerformanceTable}>Back</button>
 //                     </div>
 //                 ) : (
 //                     <div>
@@ -108,7 +108,7 @@
 //                                     <td scope="row">{data.year}</td>
 //                                     <td scope="row">
 //                                         <button className="btn btn-outline-primary"
-//                                             onClick={() => handleShowNewTable(data.courseid)}
+//                                             onClick={() => handleShowStudentPerformanceTable(data.courseid)}
 //                                         />
 //                                     </td>
 //                                 </tr>
@@ -145,11 +145,14 @@ import axios from 'axios';
 
 const CourseTable = ({ semester, year }) => {
     const [rows, setRows] = useState([]);
-    const [showNewTable, setShowNewTable] = useState(false);
+    const [showStudentPerformanceTable, setShowStudentPerformanceTable] = useState(false);
     const [courseStudents, setCourseStudents] = useState([]);
+    const [courseSummary, setCourseSummary] = useState([]);
+    const [showSummaryTable, setShowSummaryTable] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    // fetch instructor courses
     useEffect(() => {
         const fetchRows = async () => {
             try {
@@ -165,14 +168,16 @@ const CourseTable = ({ semester, year }) => {
         fetchRows();
     }, []);
 
+    // course search filter
     const filteredRows = rows.filter((row) =>
         (!semester || row.semester.toLowerCase() === semester.toLowerCase()) &&
         (!parseInt(year) || parseInt(row.year) === parseInt(year))
     );
 
-    const handleShowNewTable = async (courseId) => {
+    // show new table for selected course
+    const handleShowStudentPerformanceTable = async (courseId) => {
         setLoading(true);
-        setShowNewTable(true);
+        setShowStudentPerformanceTable(true);
         setCourseStudents([]);
         try {
             const response = await axios.post(
@@ -189,8 +194,28 @@ const CourseTable = ({ semester, year }) => {
         }
     };
 
-    const handleBackToTable = () => {
-        setShowNewTable(false);
+    const handleStudentPerformanceTable = () => {
+        setShowStudentPerformanceTable(false);
+    };
+
+    // show new table for course summary report
+    const handleCourseSummaryReport = async () => {
+        setLoading(true);
+        setShowSummaryTable(true);
+        setCourseSummary([]);
+        try {
+            const response = await axios.get('http://127.0.0.1:5000/CourseSummary');
+            setCourseSummary(response.data || []);
+        } catch (error) {
+            console.error('Error fetching course summary:', error);
+            setCourseSummary([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCourseSummaryTable = () => {
+        setShowSummaryTable(false);
     };
 
     return (
@@ -200,7 +225,7 @@ const CourseTable = ({ semester, year }) => {
                     {error}
                 </Alert>
             )}
-            {showNewTable ? (
+            {showStudentPerformanceTable ? (
                 <Box>
                     <Typography variant="h5" align="center" gutterBottom>
                         Student List
@@ -229,7 +254,44 @@ const CourseTable = ({ semester, year }) => {
                         <Button
                             variant="outlined"
                             color="primary"
-                            onClick={handleBackToTable}
+                            onClick={handleStudentPerformanceTable}
+                        >
+                            Back
+                        </Button>
+                    </Box>
+                </Box>
+            ) : showSummaryTable ? (
+                <Box>
+                    <Typography variant="h5" align="center" gutterBottom>
+                        Course Summary Report
+                    </Typography>
+                    <TableContainer component={Paper}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell><strong>Course ID</strong></TableCell>
+                                    <TableCell><strong>Course Name</strong></TableCell>
+                                    <TableCell><strong>Total Students</strong></TableCell>
+                                    <TableCell><strong>Average Grade</strong></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {courseSummary.map((summary, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>{summary.courseid}</TableCell>
+                                        <TableCell>{summary.course}</TableCell>
+                                        <TableCell>{summary.totalStudents}</TableCell>
+                                        <TableCell>{summary.averageGrade}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <Box marginTop={2} display="flex" justifyContent="center">
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={handleCourseSummaryTable}
                         >
                             Back
                         </Button>
@@ -262,7 +324,11 @@ const CourseTable = ({ semester, year }) => {
                                             <Button
                                                 variant="outlined"
                                                 color="primary"
-                                                onClick={() => handleShowNewTable(course.courseid)}
+                                                onClick={() => handleShowStudentPerformanceTable(course.courseid)}
+                                                sx={{
+                                                    display: 'block', // Ensure it behaves as a block-level element
+                                                    margin: '0 auto', // Horizontally centers it
+                                                }}
                                             >
                                                 Select
                                             </Button>
@@ -272,6 +338,15 @@ const CourseTable = ({ semester, year }) => {
                             </TableBody>
                         </Table>
                     </TableContainer>
+                    <Box marginTop={2} display="flex" justifyContent="center">
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={handleCourseSummaryReport}
+                        >
+                            Course Summary Report
+                        </Button>
+                    </Box>
                 </Box>
             )}
             {loading && (

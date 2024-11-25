@@ -141,7 +141,6 @@ def StudentCourses():
 
     return jsonify(student_course_json)
 
-# WORK IN PROGRESS
 @app.route("/InstructorCourses", methods=['GET'])
 def InstructorCourses():
     # get current instructor info
@@ -159,6 +158,26 @@ def InstructorCourses():
     conn.close()
 
     return jsonify(instructor_course_json)
+
+@app.route("/CourseSummary", methods=['GET'])
+def CourseSummary():
+    # get current instructor info
+    current_user = '1'
+    try:
+        conn = sqlite3.connect('eduPortalDB.db')
+
+        query = "select courses.id as courseid, courses.courseName as course, count(taken.student) as totalStudents, avg(taken.grade) as averageGrade " + \
+                "from courses " + \
+                "left join taken on courses.id = taken.course " + \
+                "where courses.instructor = ? " + \
+                "group by courses.id, courses.courseName;"
+        course_summary_df = pd.read_sql_query(query, conn, params=(current_user,))
+
+        course_summary_json = course_summary_df.to_dict(orient='records')
+    finally:
+        conn.close()
+
+    return jsonify(course_summary_json)
 
 @app.route("/whatIfNCourses", methods=['POST'])
 def whatIfNCourses():
@@ -1027,7 +1046,7 @@ def assign_instructors():
             return jsonify({'error': 'Instructor does not belong to the same department'}), 403
 
         conn.execute('UPDATE courses SET instructor = ? WHERE id = ?', (instructor_id, course_id))
-        log_operation(user_id, username, 'UPDATE', 'courses', f'Assigned instructor {instructor_id} to course {course_id}')
+        # log_operation(user_id, username, 'UPDATE', 'courses', f'Assigned instructor {instructor_id} to course {course_id}')
         conn.commit()
         return jsonify({'message': 'Instructor assigned successfully'}), 200
     except Exception as e:
