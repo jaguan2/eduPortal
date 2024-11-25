@@ -48,22 +48,29 @@ const AdvisorTable = () => {
 
     // Handle adding selected courses
     const handleAddSelectedCourses = async () => {
+        if (!currentStudentId) {
+            setError("No student selected for adding courses.");
+            return;
+        }
+    
         try {
             await axios.post(`http://127.0.0.1:5000/addClass`, {
-                studentId: currentStudentId,
-                courseIds: selectedRows,
+                studentId: currentStudentId, // Ensure this is a number or string
+                courseIds: selectedRows, // Valid array of course IDs
             });
-            fetchAddData(currentStudentId); // Refresh the table
+            fetchAddData(currentStudentId); // Refresh the add table data
             setError('Courses added successfully!');
+            setSelectedRows([]); // Reset selected rows
         } catch (error) {
-            setError(error.response?.data?.error || 'An unexpected error occurred!');
+            setError(`Error adding courses: ${error.response?.data?.error || error.message}`);
         }
     };
+    
 
     // Handle dropping selected courses
-    const handleDropSelectedCourses = async () => {
+    const handleDropSelectedCourses = async (studentId) => {
         try {
-            await axios.post(`http://127.0.0.1:5000/dropClass`, {
+            await axios.post(`http://127.0.0.1:5000/dropClass/${studentId}`, {
                 studentId: currentStudentId,
                 courseIds: selectedRows,
             });

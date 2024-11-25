@@ -279,87 +279,6 @@ def view_logs():
     return jsonify(logs_json), 200
 
 
-# @app.route('/addClass', methods=['GET', 'POST'])
-# def addClass():
-#     # if 'user_id' in session and 'role' in session:
-#     #     user_id = int(session['user_id'])
-#     #     role = session['role']
-
-#     current_user = 1 #how do I get this to be a student that is passed from a specific line from def advisorStudentList() table
-
-#     # Connect to the database
-#     conn = sqlite3.connect('eduPortalDB.db')
-#     cursor = conn.cursor()
-
-#     if request.method == 'GET':
-#         # Query might be wrong, trying to find courses students taking
-#         courses_query = "SELECT * FROM courses WHERE id NOT IN (SELECT course FROM taken WHERE student = '" + str(current_user) + "' );"
-
-#         courses_df = pd.read_sql(courses_query, conn)
-#         courses_list = courses_df.to_dict(orient='records')
-
-#         # Close the connection
-#         conn.close()
-
-#         # If no courses are found, return an empty list (test statement)
-#         if not courses_list:
-#             return jsonify({"message": "No new courses available"}), 200
-
-#         # # Return the list of courses as JSON
-#         # courses_list = [
-#         #     {
-#         #         "id": course[0],
-#         #         "prefix": course[1],
-#         #         "number": course[2],
-#         #         "courseName": course[3],
-#         #         "credits": course[4],
-#         #         "semester": course[5],
-#         #         "year": course[6],
-#         #         "classTime": course[7],
-#         #         "instructor": course[8]
-#         #     }
-#         #     for course in courses
-#         # ]
-
-#         return jsonify(courses_list), 200
-
-#     if request.method == 'POST':
-#         data = request.json
-#         course_ids = data.get('course_ids')  # list of course IDs
-
-#         if not course_ids:
-#             return jsonify({"error": "No courses selected"}), 400
-
-#         # Connect to the database for POST request
-#         conn = sqlite3.connect('eduPortalDB.db')
-#         cursor = conn.cursor()
-
-#         for course_id in course_ids:
-#             # checks if student is already in the same course (hopefully)
-#             taken_query = (
-#                 "SELECT * FROM taken WHERE student = " + str(current_user) + 
-#                 " AND course = " + str(course_id) + 
-#                 " AND semester = (SELECT semester FROM courses WHERE id = " + str(course_id) + ")"
-#             )
-
-#             taken_df = pd.read_sql(taken_query, conn)
-#             taken_course = taken_df.to_dict(orient='records')
-
-#             # If the student is already enrolled in the course in the same semester, return an error
-#             if taken_course:
-#                 return jsonify({"error": f"Student has already taken course {course_id} in this semester"}), 400
-
-#             # If not enrolled, insert the course into the 'taken' table
-#             insert_course = "INSERT INTO taken(student, course) VALUES (" + str(current_user) + ", " + str(course_id) + ")"
-#             cursor.execute(insert_course)
-
-#         # Commit changes and close the connection
-#         conn.commit()
-#         conn.close()
-
-#         return jsonify({"message": "Courses successfully added"}), 200
-
-
 @app.route('/addClass/<int:student_id>', methods=['GET', 'POST'])
 def addClass(student_id):
     current_user = student_id  # This is the student ID passed from the front-end
@@ -382,7 +301,7 @@ def addClass(student_id):
 
     if request.method == 'POST':
         data = request.json
-        course_ids = data.get('course_ids')
+        course_ids = data.get('courseIds')
 
         if not course_ids:
             return jsonify({"error": "No courses selected"}), 400
@@ -391,16 +310,16 @@ def addClass(student_id):
         cursor = conn.cursor()
 
         for course_id in course_ids:
-            taken_query = (
-                "SELECT * FROM taken WHERE student = " + str(current_user) + 
-                " AND course = " + str(course_id) + 
-                " AND semester = (SELECT semester FROM courses WHERE id = " + str(course_id) + ")"
-            )
-            taken_df = pd.read_sql(taken_query, conn)
-            taken_course = taken_df.to_dict(orient='records')
+            # taken_query = (
+            #     "SELECT * FROM taken WHERE student = " + str(current_user) + 
+            #     " AND course = " + str(course_id) + 
+            #     " AND semester = (SELECT semester FROM courses WHERE id = " + str(course_id) + ")"
+            # )
+            # taken_df = pd.read_sql(taken_query, conn)
+            # taken_course = taken_df.to_dict(orient='records')
 
-            if taken_course:
-                return jsonify({"error": f"Student has already taken course {course_id} in this semester"}), 400
+            # if taken_course:
+            #     return jsonify({"error": f"Student has already taken course {course_id} in this semester"}), 400
 
             insert_course = "INSERT INTO taken(student, course) VALUES (" + str(current_user) + ", " + str(course_id) + ")"
             cursor.execute(insert_course)
