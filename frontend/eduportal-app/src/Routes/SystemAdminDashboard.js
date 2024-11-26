@@ -21,8 +21,8 @@ import SystemAdminNavigation from '../Components/SystemAdminNavigation';
 const SystemAdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('logs'); // Track active page
     const [error, setError] = useState('');
-    const [UID, setUID] = useState('Admin123');
-    const [department, setDepartment] = useState('Admin Department');
+    const [UID, setUID] = useState('U550000001');
+    const [department, setDepartment] = useState('Admin');
 
     const handleLogout = () => {
         window.location.href = '/'; // Redirect to login page

@@ -74,7 +74,6 @@ const AdvisorDashboard = () => {
             {/* Student List Section */}
             <Paper elevation={3} style={{ padding: '2rem' }}>
                 <Typography variant="h5" align="center" gutterBottom>
-                    Student List
                 </Typography>
                 <AdvisorTable />
             </Paper>
