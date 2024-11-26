@@ -162,7 +162,10 @@ def InstructorCourses():
 @app.route("/CourseSummary", methods=['GET'])
 def CourseSummary():
     # get current instructor info
+    # current_user = session.get('user_id')
     current_user = '1'
+    if not current_user:
+        return jsonify({"error": "User not authenticated"}), 401  # Return error if no user in session
     try:
         conn = sqlite3.connect('eduPortalDB.db')
 
@@ -300,7 +303,8 @@ def login():
             # If credentials match, set the session
             user_id = user_df.iloc[0]['id'] 
             session['user_id'] = user_id
-            return jsonify({"message": "Login successful", "user_id": int(user_id)}), 200
+            session['role'] = role # store the user's role
+            return jsonify({"message": "Login successful", "user_id": int(user_id), "role": role}), 200
         else:
             return jsonify({"error": "Invalid credentials"}), 401
     else:

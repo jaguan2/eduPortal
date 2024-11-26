@@ -189,6 +189,7 @@ const CourseTable = ({ semester, year }) => {
         } catch (error) {
             setCourseStudents([]);
             console.error('Error fetching data:', error);
+            alert("Error fetching data.");
         } finally {
             setLoading(false);
         }
@@ -208,6 +209,7 @@ const CourseTable = ({ semester, year }) => {
             setCourseSummary(response.data || []);
         } catch (error) {
             console.error('Error fetching course summary:', error);
+            alert("Error fetching data.");
             setCourseSummary([]);
         } finally {
             setLoading(false);
